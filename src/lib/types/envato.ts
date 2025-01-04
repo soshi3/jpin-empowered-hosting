@@ -27,6 +27,8 @@ export interface EnvatoDetailedItem {
   id: number;
   name: string;
   previews: EnvatoItemPreview;
+  url: string;
+  live_site_preview: string;
 }
 
 export interface EnvatoResponse {
