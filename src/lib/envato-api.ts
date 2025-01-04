@@ -60,27 +60,38 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
 
     return await Promise.all(searchResponse.data.matches.map(async (item) => {
       try {
-        const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item-preview?item_id=${item.id}`, {
+        // Get detailed item information including preview images
+        const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Accept': 'application/json',
           }
         });
 
-        const previewData = itemResponse.data;
-        console.log('Retrieved preview data for item:', {
+        const itemData = itemResponse.data;
+        console.log('Retrieved item details:', {
           id: item.id,
           name: item.name,
-          previewData: previewData
+          itemData: itemData
         });
-
-        // Get the best available image URL
-        const imageUrl = previewData.preview_landscape_url || 
-                        previewData.preview_icon_url || 
-                        item.live_preview_url || 
-                        item.preview_url || 
-                        item.thumbnail_url ||
-                        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+        
+        // Try to get the best quality image URL available
+        let imageUrl = null;
+        
+        // Check preview images from the detailed response
+        if (itemData.preview) {
+          imageUrl = itemData.preview.landscape_url || 
+                    itemData.preview.icon_with_landscape_preview?.landscape_url ||
+                    itemData.preview.icon_url;
+        }
+        
+        // If no preview images, try the preview URLs from the search response
+        if (!imageUrl) {
+          imageUrl = item.live_preview_url || 
+                    item.preview_url || 
+                    item.thumbnail_url ||
+                    'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+        }
 
         console.log('Using image URL for item:', {
           id: item.id,
