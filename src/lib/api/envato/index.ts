@@ -11,19 +11,27 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     console.log('Successfully retrieved API key');
 
     const searchResponse = await searchEnvatoItems(apiKey, searchTerm);
-    const items = searchResponse.matches || [];
-    console.log(`Retrieved ${items.length} items from search`);
-    
-    if (!items || items.length === 0) {
-      console.log('No items found in search response');
+    console.log('Search response:', searchResponse);
+
+    // Ensure we have a valid response with matches
+    if (!searchResponse || !searchResponse.matches || !Array.isArray(searchResponse.matches)) {
+      console.log('No valid items found in search response');
       return [];
     }
+
+    const items = searchResponse.matches;
+    console.log(`Retrieved ${items.length} items from search`);
     
+    // Process items only if we have a valid array
     const processedItems = await Promise.all(
-      items.map(item => processEnvatoItem(item, apiKey))
+      items.map(item => {
+        console.log('Processing item:', item);
+        return processEnvatoItem(item, apiKey);
+      })
     );
     console.log(`Processed ${processedItems.length} items`);
     
+    // Fetch sorted products from Supabase
     const { data: sortedProducts, error } = await supabase
       .from('products')
       .select('*')

@@ -32,6 +32,13 @@ export const searchEnvatoItems = async (
         sort_by: 'sales'
       }
     });
+    
+    // Validate response structure
+    if (!response.data || !response.data.matches) {
+      console.warn('Invalid response structure from Envato API:', response.data);
+      return { matches: [] };
+    }
+    
     console.log('Search response:', response.data);
     return response.data;
   } catch (error) {
