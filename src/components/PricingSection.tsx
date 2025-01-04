@@ -5,38 +5,38 @@ import { Check } from "lucide-react";
 export const PricingSection = () => {
   const plans = [
     {
-      name: "スタンダード",
+      name: "ホスティング",
       price: 9800,
       features: [
-        "基本ホスティング",
+        "高性能サーバー",
         "SSL証明書",
         "メールサポート",
         "月次レポート",
+        "自動バックアップ",
       ],
     },
     {
-      name: "プロフェッショナル",
+      name: "保守運用",
       price: 29800,
       features: [
-        "高性能ホスティング",
-        "SSL証明書",
-        "24/7サポート",
-        "月次レポート",
-        "セキュリティ監視",
-        "バックアップ",
+        "24/7監視",
+        "セキュリティ対策",
+        "技術サポート",
+        "定期アップデート",
+        "パフォーマンス最適化",
+        "障害対応",
       ],
     },
     {
-      name: "エンタープライズ",
-      price: 98000,
+      name: "フルサポート",
+      price: 35800,
       features: [
-        "専用サーバー",
-        "SSL証明書",
-        "24/7優先サポート",
-        "週次レポート",
-        "セキュリティ監視",
-        "自動バックアップ",
-        "カスタマイズ可能",
+        "ホスティング全機能",
+        "保守運用全機能",
+        "優先サポート",
+        "カスタマイズ対応",
+        "定期ミーティング",
+        "専任担当者",
       ],
     },
   ];
@@ -44,7 +44,8 @@ export const PricingSection = () => {
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">ホスティングプラン</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">サポートプラン</h2>
+        <p className="text-center text-gray-600 mb-12">商品購入時にオプションとして追加できます</p>
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan) => (
             <Card key={plan.name} className="relative overflow-hidden">

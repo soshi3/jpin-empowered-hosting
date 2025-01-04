@@ -1,16 +1,25 @@
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
-import { PricingSection } from "@/components/PricingSection";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Server, Shield, Check } from "lucide-react";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { toast } = useToast();
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({
+    hosting: false,
+    maintenance: false
+  });
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["products", id],
@@ -52,6 +61,26 @@ const ProductDetail = () => {
     }
   }, [products?.image]);
 
+  const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80";
+
+  const calculateTotalPrice = () => {
+    let total = products?.price || 0;
+    if (selectedOptions.hosting) total += 9800;
+    if (selectedOptions.maintenance) total += 29800;
+    return total;
+  };
+
+  const handlePurchase = () => {
+    toast({
+      title: "購入手続きを開始します",
+      description: `選択されたオプション：${[
+        "商品",
+        selectedOptions.hosting && "ホスティング",
+        selectedOptions.maintenance && "保守運用"
+      ].filter(Boolean).join(", ")}`,
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen">
@@ -84,7 +113,6 @@ const ProductDetail = () => {
   }
 
   const product = products;
-  const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80";
 
   return (
     <div className="min-h-screen">
@@ -112,34 +140,89 @@ const ProductDetail = () => {
             />
           </div>
           <div>
-            <h1 className="text-4xl font-bold mb-4">
-              {product?.title}
-            </h1>
-            <p className="text-xl text-gray-600 mb-6 whitespace-pre-line">
+            <div className="flex items-center gap-4 mb-4">
+              <h1 className="text-4xl font-bold">
+                {product?.title}
+              </h1>
+              <Badge variant="secondary">
+                <Package className="w-4 h-4 mr-2" />
+                商品
+              </Badge>
+            </div>
+            
+            <p className="text-xl text-gray-600 mb-8 whitespace-pre-line">
               {product?.description?.split('. ').join('.\n')}
             </p>
-            <p className="text-3xl font-bold text-primary mb-8">
-              ¥{product?.price?.toLocaleString()}
-            </p>
-            <div className="mb-8">
-              <h3 className="text-xl font-bold mb-4">主な機能</h3>
-              <ul className="space-y-4">
-                {product?.description?.split('. ').map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="w-2 h-2 bg-secondary rounded-full mr-2 mt-2" />
-                    <span>{feature.trim()}</span>
-                  </li>
-                ))}
-              </ul>
+
+            <Card className="mb-8">
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-4">
+                    <Checkbox
+                      id="hosting"
+                      checked={selectedOptions.hosting}
+                      onCheckedChange={(checked) => 
+                        setSelectedOptions(prev => ({ ...prev, hosting: checked === true }))
+                      }
+                    />
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="hosting" className="text-base font-semibold flex items-center gap-2">
+                        <Server className="w-4 h-4" />
+                        ホスティング
+                        <Badge variant="outline">¥9,800/月</Badge>
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        高性能サーバーでの安定したホスティングサービス
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start space-x-4">
+                    <Checkbox
+                      id="maintenance"
+                      checked={selectedOptions.maintenance}
+                      onCheckedChange={(checked) => 
+                        setSelectedOptions(prev => ({ ...prev, maintenance: checked === true }))
+                      }
+                    />
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="maintenance" className="text-base font-semibold flex items-center gap-2">
+                        <Shield className="w-4 h-4" />
+                        保守運用
+                        <Badge variant="outline">¥29,800/月</Badge>
+                      </Label>
+                      <p className="text-sm text-muted-foreground">
+                        24時間365日の監視と技術サポート
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <p className="text-sm text-gray-600">商品価格</p>
+                <p className="text-3xl font-bold text-primary">
+                  ¥{product?.price?.toLocaleString()}
+                </p>
+              </div>
+              {(selectedOptions.hosting || selectedOptions.maintenance) && (
+                <div className="text-right">
+                  <p className="text-sm text-gray-600">オプション込み合計</p>
+                  <p className="text-3xl font-bold text-primary">
+                    ¥{calculateTotalPrice().toLocaleString()}
+                  </p>
+                </div>
+              )}
             </div>
-            <Button size="lg" className="w-full md:w-auto">
+
+            <Button size="lg" className="w-full" onClick={handlePurchase}>
               購入する
             </Button>
           </div>
         </div>
       </div>
-
-      <PricingSection />
     </div>
   );
 };

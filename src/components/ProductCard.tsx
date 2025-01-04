@@ -2,7 +2,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Server, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   id: string;
@@ -17,7 +18,6 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Reset states when image prop changes
     setImageError(false);
     setIsLoading(true);
 
@@ -28,7 +28,6 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
       return;
     }
 
-    // Preload image
     const img = new Image();
     img.onload = () => {
       console.log(`Image loaded successfully for product ${id}:`, image);
@@ -47,21 +46,13 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
     };
   }, [image, id]);
 
-  const handleImageError = () => {
-    console.error(`Fallback to error handler for product ${id}:`, image);
-    setImageError(true);
-    setIsLoading(false);
-  };
-
-  // テック関連の高品質なフォールバック画像を使用（商品IDに基づいて異なる画像を選択）
   const getFallbackImage = () => {
     const fallbackImages = [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80", // tech
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80", // code
-      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80", // matrix
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80", // code on screen
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80",
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80",
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80",
     ];
-    // 商品IDに基づいて異なるフォールバック画像を選択
     const index = parseInt(id, 10) % fallbackImages.length;
     return fallbackImages[index];
   };
@@ -81,14 +72,32 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
               isLoading ? 'opacity-0' : 'opacity-100'
             }`}
-            onError={handleImageError}
+            onError={() => setImageError(true)}
             loading="lazy"
           />
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <CardTitle className="mb-2 line-clamp-1 text-lg">{title}</CardTitle>
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="mb-2 line-clamp-1 text-lg">{title}</CardTitle>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
+          </div>
+          <Badge variant="secondary" className="shrink-0">
+            <Package className="w-3 h-3 mr-1" />
+            商品
+          </Badge>
+        </div>
+        <div className="flex flex-wrap gap-2 mb-4">
+          <Badge variant="outline" className="bg-primary/5">
+            <Server className="w-3 h-3 mr-1" />
+            ホスティング対応
+          </Badge>
+          <Badge variant="outline" className="bg-primary/5">
+            <Shield className="w-3 h-3 mr-1" />
+            保守運用対応
+          </Badge>
+        </div>
         <p className="text-xl font-bold text-primary">¥{price.toLocaleString()}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
