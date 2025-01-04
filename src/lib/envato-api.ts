@@ -69,20 +69,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
     
-    // First try to get the preview image directly from the search response
-    if (item.live_preview_url || item.preview_url || item.thumbnail_url) {
-      const imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
-      console.log(`Using direct preview URL for item ${item.id}:`, imageUrl);
-      return {
-        id: String(item.id),
-        title: item.name,
-        description: item.description,
-        price: Math.round(item.price_cents / 100),
-        image: imageUrl
-      };
-    }
-
-    // If no direct preview URL is available, try to get detailed item information
+    // Get detailed item information
     console.log(`Fetching detailed information for item ${item.id}`);
     const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
       headers: {
@@ -91,21 +78,25 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
       }
     });
 
-    console.log('Retrieved item details:', {
-      id: item.id,
-      name: item.name,
-      hasPreview: !!itemResponse.data.preview
-    });
+    // Get preview images from the item response
+    const previewImages = itemResponse.data.previews?.map((preview: any) => preview.landscape_url).filter(Boolean);
+    const previewImage = previewImages?.[0];
 
-    const imageUrl = getBestImageUrl(itemResponse.data, item);
-    console.log(`Final image URL for item ${item.id}:`, imageUrl);
+    // Get the best available image URL
+    let imageUrl = previewImage;
+    if (!imageUrl) {
+      // Try to get image from the search response
+      imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
+    }
+
+    console.log(`Final image URL for item ${item.id}:`, imageUrl || 'No image found');
 
     return {
       id: String(item.id),
       title: item.name,
       description: item.description,
       price: Math.round(item.price_cents / 100),
-      image: imageUrl
+      image: imageUrl || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
     };
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
