@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Globe, Moon, Sun } from "lucide-react";
+import { Globe, Moon, Sun, Server } from "lucide-react";
 
 export const Header = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -13,8 +13,23 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-5 pointer-events-none">
+        {[...Array(6)].map((_, i) => (
+          <Server
+            key={i}
+            className="absolute text-primary"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+              opacity: 0.2 + Math.random() * 0.3,
+            }}
+            size={24 + Math.random() * 24}
+          />
+        ))}
+      </div>
+      <div className="container mx-auto px-4 py-4 flex justify-between items-center relative z-10">
         <Link to="/" className="flex items-center">
           <img 
             src="/lovable-uploads/86055be1-5c14-4fef-a32c-32eb9b88e5da.png" 
