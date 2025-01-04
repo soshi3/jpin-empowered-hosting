@@ -23,10 +23,15 @@ export const searchEnvatoItems = async (apiKey: string, searchTerm: string): Pro
           page_size: PAGE_SIZE,
           sort_by: 'sales'
         },
-        timeout: 30000 // 30 second timeout for larger requests
+        timeout: 60000 // 60 second timeout for larger requests
       });
 
-      const items = searchResponse.data.matches || [];
+      if (!searchResponse.data || !Array.isArray(searchResponse.data.matches)) {
+        console.error('Invalid response format from Envato API:', searchResponse.data);
+        break;
+      }
+
+      const items = searchResponse.data.matches;
       if (items.length === 0) {
         console.log(`No more items found on page ${page}`);
         break;
@@ -38,7 +43,7 @@ export const searchEnvatoItems = async (apiKey: string, searchTerm: string): Pro
       if (page < MAX_PAGES && items.length === PAGE_SIZE) {
         await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
       } else {
-        break; // If we didn't get a full page, no need to continue
+        break;
       }
     }
 

@@ -29,32 +29,36 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       updated_at: new Date().toISOString()
     };
 
-    if (existingProduct) {
-      console.log(`Updating existing product ${item.id}`);
-      const { error: updateError } = await supabase
-        .from('products')
-        .update(productData)
-        .eq('id', String(item.id));
+    try {
+      if (existingProduct) {
+        console.log(`Updating existing product ${item.id}`);
+        const { error: updateError } = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', String(item.id));
 
-      if (updateError) {
-        console.error(`Error updating product ${item.id}:`, updateError);
+        if (updateError) {
+          console.error(`Error updating product ${item.id}:`, updateError);
+        } else {
+          console.log(`Successfully updated product ${item.id}`);
+        }
       } else {
-        console.log(`Successfully updated product ${item.id}`);
-      }
-    } else {
-      console.log(`Inserting new product ${item.id}`);
-      const { error: insertError } = await supabase
-        .from('products')
-        .insert({
-          ...productData,
-          created_at: new Date().toISOString()
-        });
+        console.log(`Inserting new product ${item.id}`);
+        const { error: insertError } = await supabase
+          .from('products')
+          .insert({
+            ...productData,
+            created_at: new Date().toISOString()
+          });
 
-      if (insertError) {
-        console.error(`Error inserting product ${item.id}:`, insertError);
-      } else {
-        console.log(`Successfully inserted product ${item.id}`);
+        if (insertError) {
+          console.error(`Error inserting product ${item.id}:`, insertError);
+        } else {
+          console.log(`Successfully inserted product ${item.id}`);
+        }
       }
+    } catch (dbError) {
+      console.error(`Database operation failed for product ${item.id}:`, dbError);
     }
 
     return productData;
