@@ -63,7 +63,8 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
     console.log('Total items retrieved:', allItems.length);
     return allItems;
   } catch (error) {
-    return handleEnvatoError(error);
+    console.error('Error in searchEnvatoItems:', error);
+    throw error;
   }
 };
 
@@ -93,7 +94,6 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
     const imageUrl = getBestImageUrl(detailedItem, item);
 
-    // Check for existing product using maybeSingle() instead of single()
     const { data: existingProduct, error: selectError } = await supabase
       .from('products')
       .select('sales')
@@ -184,18 +184,25 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     console.log('Successfully retrieved sorted products:', sortedProducts?.length);
     return sortedProducts || processedItems;
   } catch (error) {
-    console.error('Error fetching Envato items:', error);
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        throw new Error('Envato APIのエンドポイントにアクセスできません。APIキーの権限を確認してください。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
-      }
-      if (error.response?.status === 403) {
-        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。');
-      }
-      if (error.response?.data) {
-        console.error('API Error response:', error.response.data);
-      }
+    console.error('Error in fetchEnvatoItems:', error);
+    
+    // Try to fetch from database as fallback
+    console.log('Attempting to fetch products from database as fallback...');
+    const { data: fallbackProducts, error: fallbackError } = await supabase
+      .from('products')
+      .select('*')
+      .order('sales', { ascending: false });
+
+    if (fallbackError) {
+      console.error('Error fetching fallback products:', fallbackError);
+      throw new Error('商品情報の取得に失敗しました。しばらく経ってからもう一度お試しください。');
     }
-    throw error;
+
+    if (fallbackProducts && fallbackProducts.length > 0) {
+      console.log('Retrieved fallback products from database:', fallbackProducts.length);
+      return fallbackProducts;
+    }
+
+    throw new Error('商品情報の取得に失敗しました。しばらく経ってからもう一度お試しください。');
   }
 };
