@@ -1,23 +1,11 @@
 import { useState } from "react";
-import { useAuth } from "@supabase/auth-helpers-react";
-import { Star, Edit2, Trash2 } from "lucide-react";
+import { useUser } from "@supabase/auth-helpers-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-
-interface Review {
-  id: number;
-  product_id: string;
-  user_id: string;
-  rating: number;
-  comment: string;
-  created_at: string;
-  profiles: {
-    email: string;
-  };
-}
+import { ReviewForm } from "./reviews/ReviewForm";
+import { ReviewItem } from "./reviews/ReviewItem";
+import { Review } from "./reviews/types";
 
 interface ProductReviewsProps {
   productId: string;
@@ -25,9 +13,8 @@ interface ProductReviewsProps {
 
 export const ProductReviews = ({ productId }: ProductReviewsProps) => {
   const { toast } = useToast();
-  const auth = useAuth();
+  const user = useUser();
   const queryClient = useQueryClient();
-  const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
   const [editingReview, setEditingReview] = useState<Review | null>(null);
 
   const { data: reviews, isLoading } = useQuery({
@@ -50,18 +37,23 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
   });
 
   const createReviewMutation = useMutation({
-    mutationFn: async (review: typeof newReview) => {
+    mutationFn: async ({
+      rating,
+      comment,
+    }: {
+      rating: number;
+      comment: string;
+    }) => {
       const { error } = await supabase.from("reviews").insert({
         product_id: productId,
-        rating: review.rating,
-        comment: review.comment,
-        user_id: auth?.user?.id,
+        rating,
+        comment,
+        user_id: user?.id,
       });
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
-      setNewReview({ rating: 5, comment: "" });
       toast({
         title: "レビューを投稿しました",
         description: "ありがとうございます！",
@@ -78,14 +70,19 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
   });
 
   const updateReviewMutation = useMutation({
-    mutationFn: async (review: Review) => {
+    mutationFn: async ({
+      id,
+      rating,
+      comment,
+    }: {
+      id: number;
+      rating: number;
+      comment: string;
+    }) => {
       const { error } = await supabase
         .from("reviews")
-        .update({
-          rating: review.rating,
-          comment: review.comment,
-        })
-        .eq("id", review.id);
+        .update({ rating, comment })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -129,17 +126,6 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
     },
   });
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }).map((_, index) => (
-      <Star
-        key={index}
-        className={`w-5 h-5 ${
-          index < rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-        }`}
-      />
-    ));
-  };
-
   if (isLoading) {
     return <div>レビューを読み込み中...</div>;
   }
@@ -148,37 +134,15 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4">カスタマーレビュー</h2>
       
-      {auth?.user ? (
+      {user ? (
         !editingReview && (
           <div className="mb-8 p-4 border rounded-lg">
             <h3 className="font-semibold mb-2">レビューを書く</h3>
-            <div className="flex items-center mb-2">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Star
-                  key={index}
-                  className={`w-6 h-6 cursor-pointer ${
-                    index < newReview.rating
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                  onClick={() => setNewReview({ ...newReview, rating: index + 1 })}
-                />
-              ))}
-            </div>
-            <Textarea
-              value={newReview.comment}
-              onChange={(e) =>
-                setNewReview({ ...newReview, comment: e.target.value })
+            <ReviewForm
+              onSubmit={(rating, comment) =>
+                createReviewMutation.mutate({ rating, comment })
               }
-              placeholder="レビューを入力してください"
-              className="mb-2"
             />
-            <Button
-              onClick={() => createReviewMutation.mutate(newReview)}
-              disabled={!newReview.comment.trim()}
-            >
-              投稿する
-            </Button>
           </div>
         )
       ) : (
@@ -188,84 +152,32 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
       )}
 
       <div className="space-y-4">
-        {reviews?.map((review) => (
-          <div key={review.id} className="p-4 border rounded-lg">
-            {editingReview?.id === review.id ? (
-              <div>
-                <div className="flex items-center mb-2">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star
-                      key={index}
-                      className={`w-6 h-6 cursor-pointer ${
-                        index < editingReview.rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300"
-                      }`}
-                      onClick={() =>
-                        setEditingReview({
-                          ...editingReview,
-                          rating: index + 1,
-                        })
-                      }
-                    />
-                  ))}
-                </div>
-                <Textarea
-                  value={editingReview.comment}
-                  onChange={(e) =>
-                    setEditingReview({
-                      ...editingReview,
-                      comment: e.target.value,
-                    })
-                  }
-                  className="mb-2"
-                />
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => updateReviewMutation.mutate(editingReview)}
-                  >
-                    更新
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setEditingReview(null)}
-                  >
-                    キャンセル
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex">{renderStars(review.rating)}</div>
-                    <span className="text-gray-600">
-                      {review.profiles?.email}
-                    </span>
-                  </div>
-                  {auth?.user?.id === review.user_id && (
-                    <div className="flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingReview(review)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteReviewMutation.mutate(review.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <p className="text-gray-700">{review.comment}</p>
-              </>
-            )}
+        {editingReview ? (
+          <div className="p-4 border rounded-lg">
+            <ReviewForm
+              initialRating={editingReview.rating}
+              initialComment={editingReview.comment}
+              onSubmit={(rating, comment) =>
+                updateReviewMutation.mutate({
+                  id: editingReview.id,
+                  rating,
+                  comment,
+                })
+              }
+              onCancel={() => setEditingReview(null)}
+              submitLabel="更新"
+            />
           </div>
+        ) : null}
+
+        {reviews?.map((review) => (
+          <ReviewItem
+            key={review.id}
+            review={review}
+            currentUserId={user?.id}
+            onEdit={setEditingReview}
+            onDelete={(reviewId) => deleteReviewMutation.mutate(reviewId)}
+          />
         ))}
       </div>
     </div>
