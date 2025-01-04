@@ -8,7 +8,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
     console.log(`Processing item ${item.id}: ${item.name}`);
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
     const imageUrl = getBestImageUrl(detailedItem, item);
-    const additionalImages = getAdditionalImageUrls(detailedItem);
+    const additional_images = getAdditionalImageUrls(detailedItem);
 
     const { data: existingProduct, error: selectError } = await supabase
       .from('products')
@@ -26,7 +26,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       description: item.description,
       price: Math.round(item.price_cents / 100),
       image: imageUrl,
-      additional_images: additionalImages,
+      additional_images,
       sales: (existingProduct?.sales || 0) + 1,
       updated_at: new Date().toISOString()
     };
@@ -69,7 +69,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       description: item.description,
       price: Math.round(item.price_cents / 100),
       image: imageUrl,
-      additionalImages: additionalImages
+      additional_images
     };
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
@@ -79,7 +79,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       description: item.description,
       price: Math.round(item.price_cents / 100),
       image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80',
-      additionalImages: []
+      additional_images: []
     };
   }
 };
