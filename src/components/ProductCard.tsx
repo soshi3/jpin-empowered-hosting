@@ -19,24 +19,25 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
     setImageError(true);
   };
 
-  // Unsplashのプレースホルダー画像を使用
-  const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80";
+  // より高品質なUnsplashのプレースホルダー画像を使用
+  const fallbackImage = "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=500&q=80";
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
-        <div className="relative w-full h-48">
+        <div className="relative aspect-video w-full">
           <img
             src={imageError ? fallbackImage : image}
             alt={title}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
             onError={handleImageError}
             loading="lazy"
+            crossOrigin="anonymous"
           />
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <CardTitle className="mb-2 line-clamp-1">{title}</CardTitle>
+        <CardTitle className="mb-2 line-clamp-1 text-lg">{title}</CardTitle>
         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
         <p className="text-xl font-bold text-primary">¥{price.toLocaleString()}</p>
       </CardContent>
