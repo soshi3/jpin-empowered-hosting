@@ -5,38 +5,38 @@ import { Check } from "lucide-react";
 export const PricingSection = () => {
   const plans = [
     {
-      name: "ホスティング",
+      name: "Hosting",
       price: 9800,
       features: [
-        "高性能サーバー",
-        "SSL証明書",
-        "メールサポート",
-        "月次レポート",
-        "自動バックアップ",
+        "High Performance Server",
+        "SSL Certificate",
+        "Email Support",
+        "Monthly Report",
+        "Automatic Backup",
       ],
     },
     {
-      name: "保守運用",
+      name: "Maintenance",
       price: 29800,
       features: [
-        "24/7監視",
-        "セキュリティ対策",
-        "技術サポート",
-        "定期アップデート",
-        "パフォーマンス最適化",
-        "障害対応",
+        "24/7 Monitoring",
+        "Security Measures",
+        "Technical Support",
+        "Regular Updates",
+        "Performance Optimization",
+        "Issue Resolution",
       ],
     },
     {
-      name: "フルサポート",
+      name: "Full Support",
       price: 35800,
       features: [
-        "ホスティング全機能",
-        "保守運用全機能",
-        "優先サポート",
-        "カスタマイズ対応",
-        "定期ミーティング",
-        "専任担当者",
+        "All Hosting Features",
+        "All Maintenance Features",
+        "Priority Support",
+        "Customization Support",
+        "Regular Meetings",
+        "Dedicated Manager",
       ],
     },
   ];
@@ -44,15 +44,15 @@ export const PricingSection = () => {
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-4">サポートプラン</h2>
-        <p className="text-center text-gray-600 mb-12">商品購入時にオプションとして追加できます</p>
+        <h2 className="text-3xl font-bold text-center mb-4">Support Plans</h2>
+        <p className="text-center text-gray-600 mb-12">Can be added as options when purchasing products</p>
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan) => (
             <Card key={plan.name} className="relative overflow-hidden">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <p className="text-3xl font-bold mt-4">
-                  ¥{plan.price.toLocaleString()}<span className="text-sm font-normal">/月</span>
+                  ¥{plan.price.toLocaleString()}<span className="text-sm font-normal">/month</span>
                 </p>
               </CardHeader>
               <CardContent>
@@ -64,7 +64,7 @@ export const PricingSection = () => {
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full mt-8">お申し込み</Button>
+                <Button className="w-full mt-8">Subscribe</Button>
               </CardContent>
             </Card>
           ))}

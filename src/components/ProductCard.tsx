@@ -85,24 +85,24 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
           </div>
           <Badge variant="secondary" className="shrink-0">
             <Package className="w-3 h-3 mr-1" />
-            商品
+            Product
           </Badge>
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           <Badge variant="outline" className="bg-primary/5">
             <Server className="w-3 h-3 mr-1" />
-            ホスティング対応
+            Hosting Available
           </Badge>
           <Badge variant="outline" className="bg-primary/5">
             <Shield className="w-3 h-3 mr-1" />
-            保守運用対応
+            Maintenance Available
           </Badge>
         </div>
         <p className="text-xl font-bold text-primary">¥{price.toLocaleString()}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Link to={`/product/${id}`} className="w-full">
-          <Button className="w-full">詳細を見る</Button>
+          <Button className="w-full">View Details</Button>
         </Link>
       </CardFooter>
     </Card>

@@ -4,30 +4,30 @@ export const FeaturesSection = () => {
   const features = [
     {
       icon: Server,
-      title: "高性能サーバー",
-      description: "最新のインフラで安定したホスティングを提供",
+      title: "High Performance Server",
+      description: "Stable hosting with latest infrastructure",
     },
     {
       icon: Shield,
-      title: "セキュリティ対策",
-      description: "24時間365日のセキュリティ監視と対策",
+      title: "Security Measures",
+      description: "24/7 security monitoring and protection",
     },
     {
       icon: Clock,
-      title: "迅速な導入",
-      description: "購入後すぐにサービスを開始可能",
+      title: "Quick Implementation",
+      description: "Start service immediately after purchase",
     },
     {
       icon: Headphones,
-      title: "専門サポート",
-      description: "経験豊富なエンジニアによる技術サポート",
+      title: "Expert Support",
+      description: "Technical support by experienced engineers",
     },
   ];
 
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">サービスの特徴</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Service Features</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="text-center">

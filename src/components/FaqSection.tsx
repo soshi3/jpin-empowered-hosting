@@ -8,27 +8,27 @@ import {
 export const FaqSection = () => {
   const faqs = [
     {
-      question: "導入にどのくらい時間がかかりますか？",
-      answer: "通常、お申し込みから24時間以内にサービスを開始できます。既存サイトの移行を含む場合は、内容により異なります。",
+      question: "How long does implementation take?",
+      answer: "Usually, service can start within 24 hours of application. For existing site migrations, timing may vary depending on content.",
     },
     {
-      question: "サポートの対応時間は？",
-      answer: "平日9:00-18:00の技術サポートを提供しています。緊急時は24時間365日対応可能です。",
+      question: "What are the support hours?",
+      answer: "Technical support is available on weekdays from 9:00-18:00. Emergency support is available 24/7.",
     },
     {
-      question: "バックアップは提供されますか？",
-      answer: "はい、日次バックアップを標準で提供しています。より頻繁なバックアップも別途ご相談可能です。",
+      question: "Is backup provided?",
+      answer: "Yes, daily backups are provided as standard. More frequent backups can be arranged upon request.",
     },
     {
-      question: "独自ドメインは使えますか？",
-      answer: "はい、お客様の独自ドメインをご利用いただけます。SSL証明書も無料で提供します。",
+      question: "Can I use a custom domain?",
+      answer: "Yes, you can use your own custom domain. We provide free SSL certificates.",
     },
   ];
 
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">よくある質問</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible>
             {faqs.map((faq, index) => (

@@ -37,8 +37,8 @@ const Index = () => {
         console.error('Error fetching Envato products:', error);
         toast({
           variant: "destructive",
-          title: "エラー",
-          description: error.message || "商品の読み込み中にエラーが発生しました。",
+          title: "Error",
+          description: error.message || "An error occurred while loading products.",
         });
       }
     }
@@ -48,12 +48,11 @@ const Index = () => {
     console.log('Performing search with query:', query);
     setSearchQuery(query);
     toast({
-      title: "検索実行",
-      description: `「${query}」で検索しています...`,
+      title: "Search Executed",
+      description: `Searching for "${query}"...`,
     });
   };
 
-  // 検索とカテゴリーフィルタリングを組み合わせた商品リストを生成
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     
@@ -62,7 +61,6 @@ const Index = () => {
     
     let filtered = products;
     
-    // 検索クエリがある場合のみフィルタリングを適用
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase().trim();
       filtered = products.filter(product => {
@@ -75,14 +73,13 @@ const Index = () => {
       
       if (filtered.length === 0) {
         toast({
-          title: "検索結果",
-          description: "該当する商品が見つかりませんでした。",
+          title: "Search Results",
+          description: "No products found matching your search.",
           variant: "destructive",
         });
       }
     }
 
-    // カテゴリーフィルタリングを適用
     if (activeCategory !== "all") {
       const categorized = categorizeProducts(filtered);
       console.log(`Products in ${activeCategory} category:`, categorized[activeCategory]?.length || 0);
@@ -101,21 +98,21 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              プロフェッショナルな<br />ホスティングソリューション
+              Professional<br />Hosting Solutions
             </h1>
             <p className="text-xl mb-8 text-white/90">
-              Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
+              One-stop solution for Codecanyon products<br />with high-quality hosting and maintenance
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90 shadow-lg">
-                プランを見る
+                View Plans
                 <ArrowRight className="ml-2" />
               </Button>
               <Button 
                 size="lg" 
                 className="bg-blue-600 text-white border-2 border-transparent hover:bg-blue-700 shadow-lg transition-all"
               >
-                お問い合わせ
+                Contact Us
               </Button>
             </div>
           </div>
@@ -128,23 +125,23 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-2 mb-12">
-            <h2 className="text-3xl font-bold text-center">おすすめ商品</h2>
+            <h2 className="text-3xl font-bold text-center">Featured Products</h2>
             {!isLoading && products && (
               <Badge variant="secondary" className="text-sm">
-                全{products.length}件
+                Total {products.length} items
               </Badge>
             )}
           </div>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">商品を読み込み中...</p>
+              <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : error ? (
             <Alert variant="destructive" className="max-w-lg mx-auto">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="ml-2">
-                {error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。"}
+                {error instanceof Error ? error.message : "An error occurred while loading products."}
               </AlertDescription>
             </Alert>
           ) : products && products.length > 0 ? (
@@ -163,14 +160,14 @@ const Index = () => {
                   ))
                 ) : (
                   <p className="col-span-3 text-center text-muted-foreground py-8">
-                    {searchQuery ? "検索条件に一致する商品が見つかりませんでした。" : "商品の読み込み中..."}
+                    {searchQuery ? "No products found matching your search criteria." : "Loading products..."}
                   </p>
                 )}
               </div>
             </div>
           ) : (
             <div className="text-center text-muted-foreground">
-              商品が見つかりませんでした。
+              No products found.
             </div>
           )}
         </div>
@@ -182,7 +179,7 @@ const Index = () => {
       {/* Contact Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">お問い合わせ</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Contact Us</h2>
           <ContactForm />
         </div>
       </section>

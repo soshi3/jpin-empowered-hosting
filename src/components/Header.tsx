@@ -14,17 +14,17 @@ export const Header = () => {
         </Link>
         <nav className="hidden md:flex space-x-6">
           <Link to="/" className="hover:text-primary transition-colors">
-            ホーム
+            Home
           </Link>
           <Link to="/products" className="hover:text-primary transition-colors">
-            商品一覧
+            Products
           </Link>
           <Link to="/contact" className="hover:text-primary transition-colors">
-            お問い合わせ
+            Contact
           </Link>
         </nav>
         <Button variant="default">
-          お問い合わせ
+          Contact Us
         </Button>
       </div>
     </header>
