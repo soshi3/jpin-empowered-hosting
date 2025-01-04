@@ -7,19 +7,34 @@ import { FaqSection } from "@/components/FaqSection";
 import { CategorySection } from "@/components/CategorySection";
 import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const Index = () => {
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  const { data: products, isLoading, error } = useQuery({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error
+  } = useInfiniteQuery({
     queryKey: ['envato-products', selectedCategory],
-    queryFn: () => fetchEnvatoItems(selectedCategory === "all" ? "wordpress" : `wordpress ${selectedCategory}`),
+    queryFn: ({ pageParam = 1 }) => 
+      fetchEnvatoItems(
+        selectedCategory === "all" ? "wordpress" : `wordpress ${selectedCategory}`,
+        pageParam
+      ),
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.hasMore ? allPages.length + 1 : undefined;
+    },
     meta: {
       onError: (error: Error) => {
         toast({
@@ -31,7 +46,34 @@ const Index = () => {
     }
   });
 
-  console.log('Products data:', products);
+  const handleObserver = useCallback((entries: IntersectionObserverEntry[]) => {
+    const [target] = entries;
+    if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+      console.log('Intersection observed, loading more items...');
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+    });
+
+    observer.observe(element);
+
+    return () => {
+      if (element) {
+        observer.unobserve(element);
+      }
+    };
+  }, [handleObserver]);
+
+  const allProducts = data?.pages.flatMap(page => page.items) ?? [];
+
+  console.log('Products data:', allProducts);
   console.log('Selected category:', selectedCategory);
   console.log('Error:', error);
 
@@ -85,12 +127,26 @@ const Index = () => {
                 {error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。"}
               </AlertDescription>
             </Alert>
-          ) : products && products.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {products.map((product) => (
-                <ProductCard key={product.id} {...product} />
-              ))}
-            </div>
+          ) : allProducts.length > 0 ? (
+            <>
+              <div className="grid md:grid-cols-3 gap-8">
+                {allProducts.map((product) => (
+                  <ProductCard key={product.id} {...product} />
+                ))}
+              </div>
+              <div
+                ref={loadMoreRef}
+                className="py-8 flex justify-center"
+              >
+                {isFetchingNextPage ? (
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                ) : hasNextPage ? (
+                  <p className="text-muted-foreground">スクロールして続きを読み込む</p>
+                ) : (
+                  <p className="text-muted-foreground">すべての商品を表示しました</p>
+                )}
+              </div>
+            </>
           ) : (
             <div className="text-center text-muted-foreground">
               商品が見つかりませんでした。

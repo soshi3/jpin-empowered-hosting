@@ -25,8 +25,8 @@ const getEnvatoApiKey = async (): Promise<string> => {
   }
 };
 
-const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<EnvatoItem[]> => {
-  console.log('Making request to Envato API with search term:', searchTerm);
+const searchEnvatoItems = async (apiKey: string, searchTerm: string, page: number = 1): Promise<EnvatoResponse> => {
+  console.log('Making request to Envato API with search term:', searchTerm, 'page:', page);
   try {
     const searchResponse = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
       headers: {
@@ -36,17 +36,18 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
       params: {
         term: searchTerm,
         site: 'codecanyon.net',
-        page: 1,
+        page: page,
         page_size: 12
       }
     });
 
     console.log('Received response from Envato API:', {
       status: searchResponse.status,
-      itemCount: searchResponse.data.matches?.length || 0
+      itemCount: searchResponse.data.matches?.length || 0,
+      totalItems: searchResponse.data.total_items || 0
     });
 
-    return searchResponse.data.matches || [];
+    return searchResponse.data;
   } catch (error) {
     return handleEnvatoError(error);
   }
@@ -87,7 +88,6 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     };
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
-    // Fallback to basic item data with default image
     return {
       id: String(item.id),
       title: item.name,
@@ -98,14 +98,18 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
   }
 };
 
-export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
-  console.log('Fetching Envato items with search term:', searchTerm);
+export const fetchEnvatoItems = async (searchTerm: string = 'wordpress', page: number = 1) => {
+  console.log('Fetching Envato items with search term:', searchTerm, 'page:', page);
   try {
     const apiKey = await getEnvatoApiKey();
-    const items = await searchEnvatoItems(apiKey, searchTerm);
-    const processedItems = await Promise.all(items.map(item => processEnvatoItem(item, apiKey)));
+    const response = await searchEnvatoItems(apiKey, searchTerm, page);
+    const processedItems = await Promise.all((response.matches || []).map(item => processEnvatoItem(item, apiKey)));
     console.log('Successfully processed all items:', processedItems.length);
-    return processedItems;
+    return {
+      items: processedItems,
+      total: response.total_items || 0,
+      hasMore: (page * 12) < (response.total_items || 0)
+    };
   } catch (error) {
     console.error('Error fetching Envato items:', error);
     if (axios.isAxiosError(error)) {
