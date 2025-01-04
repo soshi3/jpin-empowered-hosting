@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Loader2, Package, Server, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ProductCardProps {
   id: string;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ id, title, description, price, image }: ProductCardProps) => {
+  const { t } = useLanguage();
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -85,24 +87,24 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
           </div>
           <Badge variant="secondary" className="shrink-0">
             <Package className="w-3 h-3 mr-1" />
-            商品
+            {t('product')}
           </Badge>
         </div>
         <div className="flex flex-wrap gap-2 mb-4">
           <Badge variant="outline" className="bg-primary/5">
             <Server className="w-3 h-3 mr-1" />
-            ホスティング対応
+            {t('hostedSupported')}
           </Badge>
           <Badge variant="outline" className="bg-primary/5">
             <Shield className="w-3 h-3 mr-1" />
-            保守運用対応
+            {t('maintenanceSupported')}
           </Badge>
         </div>
         <p className="text-xl font-bold text-primary">¥{price.toLocaleString()}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Link to={`/product/${id}`} className="w-full">
-          <Button className="w-full">詳細を見る</Button>
+          <Button className="w-full">{t('viewDetails')}</Button>
         </Link>
       </CardFooter>
     </Card>
