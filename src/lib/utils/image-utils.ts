@@ -21,12 +21,33 @@ export const getBestImageUrl = (
   const imageUrl = possibleImageUrls.find(url => url && typeof url === 'string');
   
   if (imageUrl) {
-    console.log(`Found image URL for item ${searchItem.id}:`, imageUrl);
+    console.log(`Found main image URL for item ${searchItem.id}:`, imageUrl);
     return imageUrl;
   }
 
-  console.log(`No image URL found for item ${searchItem.id}, using default fallback`);
+  console.log(`No main image URL found for item ${searchItem.id}, using default fallback`);
   return DEFAULT_FALLBACK_IMAGE;
+};
+
+export const getAdditionalImageUrls = (
+  detailedItem: EnvatoDetailedItem
+): string[] => {
+  const additionalImages: string[] = [];
+
+  if (detailedItem.previews?.preview_images) {
+    // Skip the first image as it's used as the main image
+    const extraImages = detailedItem.previews.preview_images
+      .slice(1)
+      .map(img => img.landscape_url)
+      .filter((url): url is string => typeof url === 'string');
+    
+    if (extraImages.length > 0) {
+      console.log(`Found ${extraImages.length} additional images for item ${detailedItem.id}`);
+      additionalImages.push(...extraImages);
+    }
+  }
+
+  return additionalImages;
 };
 
 export const handleEnvatoError = (error: unknown): never => {

@@ -39,6 +39,7 @@ export interface ProcessedItem {
   description: string;
   price: number;
   image: string;
+  additionalImages: string[];
 }
 
 export type EnvatoApiError = {
