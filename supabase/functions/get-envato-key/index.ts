@@ -8,43 +8,42 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, {
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      },
+      status: 204,
+    })
   }
 
   try {
     const ENVATO_API_KEY = Deno.env.get('ENVATO_API_KEY')
-    
     if (!ENVATO_API_KEY) {
-      console.error('ENVATO_API_KEY not found in environment variables')
-      return new Response(
-        JSON.stringify({ 
-          error: 'ENVATO_API_KEY not configured' 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500 
-        }
-      )
+      console.error('ENVATO_API_KEY is not set')
+      throw new Error('ENVATO_API_KEY is not configured')
     }
 
-    console.log('Successfully retrieved ENVATO_API_KEY')
     return new Response(
       JSON.stringify({ ENVATO_API_KEY }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200 
+      {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: 200,
       }
     )
   } catch (error) {
     console.error('Error in get-envato-key function:', error)
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        details: error.message 
-      }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+      JSON.stringify({ error: error.message }),
+      {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: 500,
       }
     )
   }
