@@ -24,8 +24,9 @@ const ProductDetail = () => {
       console.log('Found product:', product);
       return {
         ...product,
-        image: typeof product.image === 'object' && product.image !== null ? 
-          product.image.value : product.image // Safely handle both object and string cases
+        image: product.image ? 
+          (typeof product.image === 'object' ? product.image.value : product.image) 
+          : null
       };
     },
   });
@@ -99,7 +100,7 @@ const ProductDetail = () => {
               </div>
             )}
             <img
-              src={imageError ? fallbackImage : product?.image}
+              src={imageError || !product?.image ? fallbackImage : product.image}
               alt={product?.title}
               className={`w-full rounded-lg shadow-lg transition-opacity duration-300 ${
                 imageLoading ? 'opacity-0' : 'opacity-100'
