@@ -70,6 +70,12 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
     };
   }, [id, currentImage]);
 
+  // Format description to remove excessive line breaks
+  const formatDescription = (text: string) => {
+    // Replace 3 or more consecutive line breaks with 2 line breaks
+    return text.replace(/\n{3,}/g, '\n\n');
+  };
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
@@ -151,7 +157,9 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="mb-2 line-clamp-1 text-lg">{title}</CardTitle>
-            <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2 whitespace-pre-line">
+              {formatDescription(description)}
+            </p>
           </div>
           <Badge variant="secondary" className="shrink-0">
             <Package className="w-3 h-3 mr-1" />
