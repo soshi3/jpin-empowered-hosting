@@ -19,40 +19,39 @@ serve(async (req) => {
 
   try {
     const ENVATO_API_KEY = Deno.env.get('ENVATO_API_KEY')
-    console.log('Retrieved ENVATO_API_KEY:', ENVATO_API_KEY ? 'Present' : 'Missing')
     
     if (!ENVATO_API_KEY) {
-      console.error('Envato API key not found in environment variables')
-      throw new Error('Envato API key not configured')
+      console.error('ENVATO_API_KEY not found in environment variables')
+      return new Response(
+        JSON.stringify({ 
+          error: 'ENVATO_API_KEY not configured' 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500 
+        }
+      )
     }
 
+    console.log('Successfully retrieved ENVATO_API_KEY')
     return new Response(
-      JSON.stringify({ 
-        ENVATO_API_KEY,
-        status: 'success'
-      }),
+      JSON.stringify({ ENVATO_API_KEY }),
       { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json'
-        },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
-      },
+      }
     )
   } catch (error) {
-    console.error('Error in get-envato-key function:', error.message)
+    console.error('Error in get-envato-key function:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message,
-        status: 'error'
+        error: 'Internal server error',
+        details: error.message 
       }),
       { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json'
-        },
-        status: 400
-      },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
+      }
     )
   }
 })
