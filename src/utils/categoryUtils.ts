@@ -4,68 +4,129 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
   if (!products) return {};
   
   return products.reduce((acc: Record<string, ProcessedItem[]>, product) => {
-    const categories = new Set(['web-app']); // デフォルトカテゴリー
-    const titleLower = product.title.toLowerCase();
-    const descLower = product.description.toLowerCase();
+    const categories = new Set<string>();
+    const titleLower = product.title?.toLowerCase() || '';
+    const descLower = product.description?.toLowerCase() || '';
+    const tagsLower = product.tags?.map(tag => tag.toLowerCase()) || [];
     
-    // ビジネスカテゴリーの判定条件を拡充
+    // Templates category
     if (
-      titleLower.includes('business') || 
-      titleLower.includes('corporate') || 
+      titleLower.includes('template') ||
+      descLower.includes('template') ||
+      tagsLower.includes('template') ||
+      titleLower.includes('theme') ||
+      descLower.includes('theme')
+    ) {
+      categories.add('templates');
+    }
+
+    // Web Applications category
+    if (
+      titleLower.includes('application') ||
+      titleLower.includes('app') ||
+      descLower.includes('application') ||
+      descLower.includes('app') ||
+      titleLower.includes('plugin') ||
+      titleLower.includes('module') ||
+      tagsLower.includes('application') ||
+      tagsLower.includes('plugin')
+    ) {
+      categories.add('web-applications');
+    }
+
+    // Business category
+    if (
+      titleLower.includes('business') ||
+      titleLower.includes('corporate') ||
       titleLower.includes('company') ||
-      titleLower.includes('enterprise') ||
-      titleLower.includes('office') ||
-      descLower.includes('business') || 
-      descLower.includes('corporate') ||
-      descLower.includes('company') ||
-      descLower.includes('enterprise') ||
-      descLower.includes('office') ||
-      // Wordpressのビジネステーマ関連のキーワード
-      titleLower.includes('business theme') ||
-      titleLower.includes('corporate theme') ||
-      titleLower.includes('company theme') ||
-      descLower.includes('business theme') ||
-      descLower.includes('corporate theme') ||
-      descLower.includes('company theme')
+      descLower.includes('business solution') ||
+      descLower.includes('business management') ||
+      tagsLower.includes('business') ||
+      tagsLower.includes('corporate')
     ) {
       categories.add('business');
     }
 
-    // その他のカテゴリー判定
-    if (titleLower.includes('landing') || titleLower.includes('lp') || 
-        descLower.includes('landing') || descLower.includes('lp')) {
-      categories.add('landing-page');
-    }
-    if (titleLower.includes('admin') || titleLower.includes('dashboard') || 
-        descLower.includes('admin') || descLower.includes('dashboard')) {
-      categories.add('dashboard');
-    }
-    if (titleLower.includes('shop') || titleLower.includes('ecommerce') || 
-        titleLower.includes('store') || descLower.includes('shop') || 
-        descLower.includes('ecommerce') || descLower.includes('store')) {
+    // E-commerce category
+    if (
+      titleLower.includes('ecommerce') ||
+      titleLower.includes('e-commerce') ||
+      titleLower.includes('shop') ||
+      titleLower.includes('store') ||
+      titleLower.includes('woocommerce') ||
+      descLower.includes('ecommerce') ||
+      descLower.includes('e-commerce') ||
+      tagsLower.includes('ecommerce') ||
+      tagsLower.includes('woocommerce')
+    ) {
       categories.add('ecommerce');
     }
-    if (titleLower.includes('community') || titleLower.includes('social') || 
-        titleLower.includes('forum') || descLower.includes('community') || 
-        descLower.includes('social') || descLower.includes('forum')) {
-      categories.add('community');
-    }
-    if (titleLower.includes('developer') || titleLower.includes('api') || 
-        descLower.includes('developer') || descLower.includes('api')) {
-      categories.add('developer');
-    }
-    if (titleLower.includes('design') || titleLower.includes('ui kit') || 
-        descLower.includes('design') || descLower.includes('ui kit')) {
-      categories.add('design');
+
+    // Corporate category
+    if (
+      titleLower.includes('corporate') ||
+      titleLower.includes('enterprise') ||
+      titleLower.includes('company portal') ||
+      descLower.includes('corporate') ||
+      descLower.includes('enterprise solution') ||
+      tagsLower.includes('corporate') ||
+      tagsLower.includes('enterprise')
+    ) {
+      categories.add('corporate');
     }
 
-    // 各カテゴリーに商品を追加
+    // Blog category
+    if (
+      titleLower.includes('blog') ||
+      titleLower.includes('magazine') ||
+      titleLower.includes('news') ||
+      descLower.includes('blog') ||
+      descLower.includes('blogging') ||
+      tagsLower.includes('blog') ||
+      tagsLower.includes('magazine')
+    ) {
+      categories.add('blog');
+    }
+
+    // Portfolio category
+    if (
+      titleLower.includes('portfolio') ||
+      titleLower.includes('showcase') ||
+      titleLower.includes('gallery') ||
+      descLower.includes('portfolio') ||
+      descLower.includes('showcase') ||
+      tagsLower.includes('portfolio') ||
+      tagsLower.includes('gallery')
+    ) {
+      categories.add('portfolio');
+    }
+
+    // Landing category
+    if (
+      titleLower.includes('landing') ||
+      titleLower.includes('landing page') ||
+      titleLower.includes('one page') ||
+      descLower.includes('landing page') ||
+      tagsLower.includes('landing') ||
+      tagsLower.includes('landing page')
+    ) {
+      categories.add('landing');
+    }
+
+    // If no category matches, add to templates as default
+    if (categories.size === 0) {
+      categories.add('templates');
+    }
+
+    // Add product to each matching category
     categories.forEach(category => {
       if (!acc[category]) {
         acc[category] = [];
       }
       acc[category].push(product);
     });
+    
+    console.log(`Categorized product "${product.title}" into:`, Array.from(categories));
     
     return acc;
   }, {});
