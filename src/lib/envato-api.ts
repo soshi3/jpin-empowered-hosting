@@ -53,7 +53,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }));
   } catch (error) {
     console.error('Error fetching Envato items:', error);
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+    if (axios.isAxiosError(error) && error.response?.status === 403) {
       throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
     }
     throw error;
