@@ -71,10 +71,17 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
         });
 
         const itemData = itemResponse.data;
+        const imageUrl = itemData.preview?.landscape_url || 
+                        itemData.preview?.icon_url || 
+                        itemData.preview?.icon_with_landscape_preview?.landscape_url ||
+                        item.live_preview_url || 
+                        item.preview_url || 
+                        item.thumbnail_url;
+
         console.log('Retrieved item details:', {
           id: item.id,
           name: item.name,
-          imageUrl: itemData.preview?.landscape_url || itemData.preview?.icon_url
+          imageUrl: imageUrl
         });
 
         return {
@@ -82,21 +89,20 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
           title: item.name,
           description: item.description,
           price: Math.round(item.price_cents / 100),
-          image: itemData.preview?.landscape_url || 
-                itemData.preview?.icon_url || 
-                item.live_preview_url || 
-                item.preview_url || 
-                item.thumbnail_url || 
-                null
+          image: imageUrl || null
         };
       } catch (itemError) {
         console.error(`Error fetching details for item ${item.id}:`, itemError);
+        // Fallback to basic item data if detailed fetch fails
+        const fallbackImageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
+        console.log(`Using fallback image for item ${item.id}:`, fallbackImageUrl);
+        
         return {
           id: String(item.id),
           title: item.name,
           description: item.description,
           price: Math.round(item.price_cents / 100),
-          image: item.live_preview_url || item.preview_url || item.thumbnail_url || null
+          image: fallbackImageUrl || null
         };
       }
     }));
