@@ -29,10 +29,6 @@ serve(async (req) => {
       }
     )
 
-    if (!response.ok) {
-      throw new Error(`Envato API error: ${response.status}`)
-    }
-
     const data = await response.json()
 
     return new Response(
@@ -46,9 +42,7 @@ serve(async (req) => {
     )
   } catch (error) {
     return new Response(
-      JSON.stringify({
-        error: error.message || 'An unexpected error occurred',
-      }),
+      JSON.stringify({ error: error.message }),
       {
         status: 500,
         headers: {

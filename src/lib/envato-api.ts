@@ -44,9 +44,7 @@ export const fetchEnvatoItems = async (
       }
     });
 
-    const envatoData = response.data;
-    
-    const processedItems: ProcessedItem[] = envatoData.matches.map(item => ({
+    const processedItems: ProcessedItem[] = response.data.matches.map(item => ({
       id: item.id.toString(),
       title: item.wordpress_theme_metadata?.theme_name || item.name,
       description: item.wordpress_theme_metadata?.description || item.description,
@@ -60,14 +58,10 @@ export const fetchEnvatoItems = async (
       image: item.preview_url
     }));
 
-    const totalItems = envatoData.total_items;
-    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-    const hasMore = page < totalPages;
-
     return {
       items: processedItems,
-      total: totalItems,
-      hasMore,
+      total: response.data.total_items,
+      hasMore: page < Math.ceil(response.data.total_items / ITEMS_PER_PAGE),
       currentPage: page
     };
   } catch (error) {
