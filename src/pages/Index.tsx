@@ -82,23 +82,23 @@ const Index = () => {
       <section className="relative min-h-[600px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-white">
           <div className="stripe-gradient" />
-          <div className="absolute inset-0 hero-gradient opacity-30" />
-          <div className="absolute inset-0 mesh-gradient opacity-20" />
+          <div className="absolute inset-0 hero-gradient opacity-60" />
+          <div className="absolute inset-0 mesh-gradient opacity-40" />
         </div>
         <div className="relative z-10 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 drop-shadow-sm">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-gray-800 drop-shadow-sm">
+            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 shadow-lg">
+              <Button size="lg" variant="default" className="bg-primary hover:bg-primary/90">
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10 shadow-lg backdrop-blur-sm">
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
                 お問い合わせ
               </Button>
             </div>
