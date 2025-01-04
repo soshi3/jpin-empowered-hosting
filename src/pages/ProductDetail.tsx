@@ -24,7 +24,8 @@ const ProductDetail = () => {
       console.log('Found product:', product);
       return {
         ...product,
-        image: product.image?.value || product.image // Handle both object and string cases
+        image: typeof product.image === 'object' && product.image !== null ? 
+          product.image.value : product.image // Safely handle both object and string cases
       };
     },
   });
