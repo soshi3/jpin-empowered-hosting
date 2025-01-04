@@ -36,11 +36,12 @@
 .hero-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(37, 99, 235, 0.6),
-    rgba(16, 185, 129, 0.6)
-  );
+  background: 
+    linear-gradient(45deg, rgba(37, 99, 235, 0.6) 25%, transparent 25%) -50px 0,
+    linear-gradient(-45deg, rgba(16, 185, 129, 0.6) 25%, transparent 25%) -50px 0,
+    linear-gradient(45deg, transparent 75%, rgba(37, 99, 235, 0.6) 75%) -50px 0,
+    linear-gradient(-45deg, transparent 75%, rgba(16, 185, 129, 0.6) 75%) -50px 0;
+  background-size: 100px 100px;
   z-index: 1;
   mix-blend-mode: overlay;
 }
@@ -49,16 +50,12 @@
 .stripe-gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    125deg,
-    #ff3366,
-    #ff6b6b,
-    #4834d4,
-    #686de0,
-    #be2edd,
-    #ff3366
-  );
-  background-size: 400% 400%;
+  background: 
+    linear-gradient(60deg, transparent 25%, rgba(255, 51, 102, 0.4) 25%) -30px 0,
+    linear-gradient(-60deg, transparent 25%, rgba(104, 109, 224, 0.4) 25%) -30px 0,
+    linear-gradient(60deg, rgba(190, 46, 221, 0.4) 75%, transparent 75%) -30px 0,
+    linear-gradient(-60deg, rgba(255, 51, 102, 0.4) 75%, transparent 75%) -30px 0;
+  background-size: 80px 80px;
   opacity: 0.45;
   animation: stripeGradient 15s ease infinite;
   z-index: 0;
