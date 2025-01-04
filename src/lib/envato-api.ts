@@ -35,7 +35,6 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     const apiKey = secretData.ENVATO_API_KEY;
     console.log('Making request to Envato API...');
     
-    // First, get the list of items
     const searchResponse = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -59,40 +58,34 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       return [];
     }
 
-    // Process each item
     return await Promise.all(searchResponse.data.matches.map(async (item) => {
       try {
-        // Get detailed item information including images
-        const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
+        const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item-preview?item_id=${item.id}`, {
           headers: {
             'Authorization': `Bearer ${apiKey}`,
             'Accept': 'application/json',
           }
         });
 
-        const itemData = itemResponse.data;
-        
-        // Try to get the best quality image URL available
-        let imageUrl = null;
-        
-        // Check preview images from the detailed response
-        if (itemData.preview) {
-          imageUrl = itemData.preview.landscape_url || 
-                    itemData.preview.icon_with_landscape_preview?.landscape_url ||
-                    itemData.preview.icon_url;
-        }
-        
-        // If no preview images, try the preview URLs from the search response
-        if (!imageUrl) {
-          imageUrl = item.live_preview_url || 
-                    item.preview_url || 
-                    item.thumbnail_url;
-        }
-
-        console.log('Retrieved item details:', {
+        const previewData = itemResponse.data;
+        console.log('Retrieved preview data for item:', {
           id: item.id,
           name: item.name,
-          imageUrl: imageUrl || 'No image URL found'
+          previewData: previewData
+        });
+
+        // Get the best available image URL
+        const imageUrl = previewData.preview_landscape_url || 
+                        previewData.preview_icon_url || 
+                        item.live_preview_url || 
+                        item.preview_url || 
+                        item.thumbnail_url ||
+                        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+
+        console.log('Using image URL for item:', {
+          id: item.id,
+          name: item.name,
+          imageUrl: imageUrl
         });
 
         return {
@@ -104,19 +97,15 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
         };
       } catch (itemError) {
         console.error(`Error fetching details for item ${item.id}:`, itemError);
-        // Fallback to basic item data if detailed fetch fails
-        const fallbackImageUrl = item.live_preview_url || 
-                               item.preview_url || 
-                               item.thumbnail_url;
-                               
-        console.log(`Using fallback image for item ${item.id}:`, fallbackImageUrl || 'No fallback image found');
+        // フォールバック画像を使用
+        const fallbackImage = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
         
         return {
           id: String(item.id),
           title: item.name,
           description: item.description,
           price: Math.round(item.price_cents / 100),
-          image: fallbackImageUrl
+          image: fallbackImage
         };
       }
     }));
