@@ -4,17 +4,20 @@ import { PricingSection } from "@/components/PricingSection";
 import { ContactForm } from "@/components/ContactForm";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
-import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowRight, AlertCircle, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { PRODUCT_CATEGORIES } from "@/lib/types/categories";
 import { cn } from "@/lib/utils";
+import { useState, useMemo } from "react";
 
 const Index = () => {
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => fetchEnvatoItems(),
@@ -31,6 +34,7 @@ const Index = () => {
 
   console.log('Products data:', products);
   console.log('Error:', error);
+  console.log('Search query:', searchQuery);
 
   // 商品をカテゴリーに分類する関数
   const categorizeProducts = (products: any[]) => {
@@ -65,6 +69,24 @@ const Index = () => {
       return acc;
     }, {});
   };
+
+  // 検索とカテゴリーフィルタリングを組み合わせた商品リストを生成
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    
+    const filtered = products.filter(product => 
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (!window.location.hash || window.location.hash === "#all") {
+      return filtered;
+    }
+
+    const categorized = categorizeProducts(filtered);
+    const category = window.location.hash.slice(1);
+    return categorized[category] || [];
+  }, [products, searchQuery, window.location.hash]);
 
   return (
     <div className="min-h-screen">
@@ -113,12 +135,26 @@ const Index = () => {
             </Alert>
           ) : products && products.length > 0 ? (
             <div className="space-y-8">
+              {/* Search Input */}
+              <div className="max-w-md mx-auto mb-8">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="商品名で検索..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
                 <Button
                   variant="outline"
                   className={cn(
                     "flex flex-col items-center gap-2 h-auto py-4 hover:bg-primary hover:text-primary-foreground",
-                    "all" === "all" && "bg-primary text-primary-foreground"
+                    (!window.location.hash || window.location.hash === "#all") && "bg-primary text-primary-foreground"
                   )}
                   onClick={() => window.location.hash = "#all"}
                 >
@@ -146,16 +182,13 @@ const Index = () => {
               </div>
 
               <div className="grid md:grid-cols-3 gap-8">
-                {(!window.location.hash || window.location.hash === "#all" ? products : 
-                  categorizeProducts(products)[window.location.hash.slice(1)] || []
-                ).map((product: any) => (
-                  <ProductCard key={product.id} {...product} />
-                ))}
-                {window.location.hash && window.location.hash !== "#all" && 
-                 (!categorizeProducts(products)[window.location.hash.slice(1)] || 
-                  categorizeProducts(products)[window.location.hash.slice(1)].length === 0) && (
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product: any) => (
+                    <ProductCard key={product.id} {...product} />
+                  ))
+                ) : (
                   <p className="col-span-3 text-center text-muted-foreground py-8">
-                    このカテゴリーの商品は現在ありません。
+                    {searchQuery ? "検索条件に一致する商品が見つかりませんでした。" : "このカテゴリーの商品は現在ありません。"}
                   </p>
                 )}
               </div>
