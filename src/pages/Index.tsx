@@ -4,20 +4,21 @@ import { PricingSection } from "@/components/PricingSection";
 import { ContactForm } from "@/components/ContactForm";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
-import { ArrowRight, AlertCircle, Loader2, Search } from "lucide-react";
+import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { PRODUCT_CATEGORIES } from "@/lib/types/categories";
-import { cn } from "@/lib/utils";
 import { useState, useMemo } from "react";
+import { CategoryFilter } from "@/components/CategoryFilter";
+import { SearchInput } from "@/components/SearchInput";
 
 const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+  
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => fetchEnvatoItems(),
@@ -35,6 +36,7 @@ const Index = () => {
   console.log('Products data:', products);
   console.log('Error:', error);
   console.log('Search query:', searchQuery);
+  console.log('Active category:', activeCategory);
 
   // 商品をカテゴリーに分類する関数
   const categorizeProducts = (products: any[]) => {
@@ -79,14 +81,13 @@ const Index = () => {
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    if (!window.location.hash || window.location.hash === "#all") {
+    if (activeCategory === "all") {
       return filtered;
     }
 
     const categorized = categorizeProducts(filtered);
-    const category = window.location.hash.slice(1);
-    return categorized[category] || [];
-  }, [products, searchQuery, window.location.hash]);
+    return categorized[activeCategory] || [];
+  }, [products, searchQuery, activeCategory]);
 
   return (
     <div className="min-h-screen">
@@ -135,51 +136,8 @@ const Index = () => {
             </Alert>
           ) : products && products.length > 0 ? (
             <div className="space-y-8">
-              {/* Search Input */}
-              <div className="max-w-md mx-auto mb-8">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    type="text"
-                    placeholder="商品名で検索..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "flex flex-col items-center gap-2 h-auto py-4 hover:bg-primary hover:text-primary-foreground",
-                    (!window.location.hash || window.location.hash === "#all") && "bg-primary text-primary-foreground"
-                  )}
-                  onClick={() => window.location.hash = "#all"}
-                >
-                  <ArrowRight className="w-6 h-6" />
-                  <span className="text-sm">すべて</span>
-                </Button>
-                {PRODUCT_CATEGORIES.map((category) => {
-                  const Icon = category.icon;
-                  const isActive = window.location.hash === `#${category.id}`;
-                  return (
-                    <Button
-                      key={category.id}
-                      variant="outline"
-                      className={cn(
-                        "flex flex-col items-center gap-2 h-auto py-4 hover:bg-primary hover:text-primary-foreground",
-                        isActive && "bg-primary text-primary-foreground"
-                      )}
-                      onClick={() => window.location.hash = `#${category.id}`}
-                    >
-                      <Icon className="w-6 h-6" />
-                      <span className="text-sm">{category.name}</span>
-                    </Button>
-                  );
-                })}
-              </div>
+              <SearchInput value={searchQuery} onChange={setSearchQuery} />
+              <CategoryFilter onCategoryChange={setActiveCategory} />
 
               <div className="grid md:grid-cols-3 gap-8">
                 {filteredProducts.length > 0 ? (
