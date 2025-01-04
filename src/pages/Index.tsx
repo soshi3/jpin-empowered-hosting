@@ -78,27 +78,26 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section with gradient background */}
+      {/* Hero Section with new gradient background */}
       <section className="relative min-h-[600px] w-full overflow-hidden">
-        <div className="absolute inset-0 bg-white">
+        <div className="absolute inset-0">
           <div className="stripe-gradient" />
-          <div className="absolute inset-0 hero-gradient opacity-60" />
-          <div className="absolute inset-0 mesh-gradient opacity-40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
         </div>
         <div className="relative z-10 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300">
+            <p className="text-xl mb-8 text-white/90">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" variant="default" className="bg-primary hover:bg-primary/90">
+              <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90">
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
                 お問い合わせ
               </Button>
             </div>
