@@ -67,9 +67,24 @@ const Index = () => {
       filtered = products.filter(product => {
         const titleMatch = product.title?.toLowerCase().includes(query);
         const descriptionMatch = product.description?.toLowerCase().includes(query);
-        return titleMatch || descriptionMatch;
+        const authorMatch = product.author?.toLowerCase().includes(query);
+        const categoryMatch = product.category?.toLowerCase().includes(query);
+        const tagsMatch = product.tags?.some(tag => 
+          tag.toLowerCase().includes(query)
+        );
+        
+        return titleMatch || descriptionMatch || authorMatch || categoryMatch || tagsMatch;
       });
+      
       console.log('Products after search filtering:', filtered.length);
+      
+      if (filtered.length === 0) {
+        toast({
+          title: "検索結果",
+          description: "該当する商品が見つかりませんでした。",
+          variant: "destructive",
+        });
+      }
     }
 
     // カテゴリーフィルタリングを適用
