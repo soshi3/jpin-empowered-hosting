@@ -13,8 +13,12 @@ export const Header = () => {
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-heading font-bold text-primary">
-          JPIN Solutions
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/b417115b-97e7-4aed-8f4c-6dbe9e1760ee.png" 
+            alt="JPIN Solutions" 
+            className="h-8 w-auto"
+          />
         </Link>
         <nav className="hidden md:flex space-x-6">
           <Link to="/" className="hover:text-primary transition-colors">
