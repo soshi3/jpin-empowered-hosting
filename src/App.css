@@ -41,11 +41,16 @@
     rgba(37, 99, 235, 0.6),
     rgba(16, 185, 129, 0.6)
   );
-  z-index: 1;
-  mix-blend-mode: overlay;
+  z-index: -1;
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(to bottom, 
+    transparent,
+    rgba(0, 0, 0, 1) 30%,
+    rgba(0, 0, 0, 1) 70%,
+    transparent
+  );
 }
 
-/* Animated gradient background inspired by Stripe */
 .stripe-gradient {
   position: absolute;
   inset: 0;
@@ -59,9 +64,15 @@
     #ff3366
   );
   background-size: 400% 400%;
-  opacity: 0.45;
+  opacity: 0.35;
   animation: stripeGradient 15s ease infinite;
-  z-index: 0;
+  z-index: -2;
+  mask-image: linear-gradient(to bottom, 
+    transparent,
+    rgba(0, 0, 0, 1) 30%,
+    rgba(0, 0, 0, 1) 70%,
+    transparent
+  );
 }
 
 .stripe-gradient::before {
