@@ -86,7 +86,10 @@ const Index = () => {
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary shadow-lg transition-all">
+              <Button 
+                size="lg" 
+                className="bg-blue-600 text-white border-2 border-transparent hover:bg-blue-700 shadow-lg transition-all"
+              >
                 お問い合わせ
               </Button>
             </div>
