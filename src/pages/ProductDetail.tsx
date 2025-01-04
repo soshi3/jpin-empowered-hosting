@@ -7,6 +7,7 @@ import { ProductImage } from "@/components/ProductImage";
 import { ProductOptions } from "@/components/ProductOptions";
 import { ProductHeader } from "@/components/ProductHeader";
 import { ProductReviews } from "@/components/ProductReviews";
+import { SimilarProducts } from "@/components/SimilarProducts";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -67,6 +68,11 @@ const ProductDetail = () => {
           </div>
         </div>
         <ProductReviews productId={id || ""} />
+        <SimilarProducts 
+          currentProductId={id || ""}
+          category={products?.category}
+          priceRange={100}
+        />
       </div>
     </div>
   );
