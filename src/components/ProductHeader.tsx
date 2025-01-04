@@ -7,6 +7,14 @@ interface ProductHeaderProps {
 }
 
 export const ProductHeader = ({ product }: ProductHeaderProps) => {
+  // Format description to remove excessive line breaks
+  const formatDescription = (text: string = '') => {
+    // First, normalize line endings
+    const normalizedText = text.replace(/\r\n/g, '\n');
+    // Replace 3 or more consecutive line breaks with 2 line breaks
+    return normalizedText.replace(/\n{3,}/g, '\n\n');
+  };
+
   return (
     <>
       <div className="flex items-center gap-4 mb-4">
@@ -26,7 +34,7 @@ export const ProductHeader = ({ product }: ProductHeaderProps) => {
       </div>
       
       <p className="text-xl text-gray-600 mb-8 whitespace-pre-line">
-        {product?.description?.split('. ').join('.\n')}
+        {formatDescription(product?.description)}
       </p>
     </>
   );
