@@ -18,13 +18,13 @@ export const CategoryFilter = ({ onCategoryChange }: CategoryFilterProps) => {
       onCategoryChange(category);
     };
 
-    // 初期値を設定
+    // Initial value
     handleHashChange();
 
-    // hashchangeイベントリスナーを追加
+    // Add hashchange event listener
     window.addEventListener("hashchange", handleHashChange);
 
-    // クリーンアップ
+    // Cleanup
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
@@ -45,7 +45,10 @@ export const CategoryFilter = ({ onCategoryChange }: CategoryFilterProps) => {
         onClick={() => handleCategoryClick("all")}
       >
         <ArrowRight className="w-6 h-6" />
-        <span className="text-sm">すべて</span>
+        <div className="flex flex-col text-sm">
+          <span>すべて</span>
+          <span>All</span>
+        </div>
       </Button>
       {PRODUCT_CATEGORIES.map((category) => {
         const Icon = category.icon;
@@ -60,7 +63,10 @@ export const CategoryFilter = ({ onCategoryChange }: CategoryFilterProps) => {
             onClick={() => handleCategoryClick(category.id)}
           >
             <Icon className="w-6 h-6" />
-            <span className="text-sm">{category.name}</span>
+            <div className="flex flex-col text-sm">
+              <span>{category.name}</span>
+              <span>{category.nameEn}</span>
+            </div>
           </Button>
         );
       })}
