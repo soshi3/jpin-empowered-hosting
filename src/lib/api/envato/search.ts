@@ -42,13 +42,10 @@ export const searchEnvatoItems = async (
     }
 
     // Ensure matches is an array
-    if (!Array.isArray(response.data.matches)) {
-      console.warn('Response matches is not an array:', response.data.matches);
-      return { matches: [] };
-    }
+    const matches = Array.isArray(response.data.matches) ? response.data.matches : [];
+    console.log(`Found ${matches.length} matches in search response`);
     
-    console.log(`Found ${response.data.matches.length} matches in search response`);
-    return response.data;
+    return { matches };
   } catch (error) {
     console.error('Error searching Envato items:', error);
     return { matches: [] };

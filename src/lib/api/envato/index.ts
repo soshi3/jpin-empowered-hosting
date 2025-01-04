@@ -18,7 +18,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     });
 
     // Ensure we have a valid array of matches
-    if (!searchResponse?.matches || !Array.isArray(searchResponse.matches)) {
+    if (!Array.isArray(searchResponse?.matches)) {
       console.warn('No valid matches array in search response');
       return [];
     }
