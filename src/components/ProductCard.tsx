@@ -4,6 +4,13 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Loader2, Package, Server, Shield } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface ProductCardProps {
   id: string;
@@ -11,11 +18,14 @@ interface ProductCardProps {
   description: string;
   price: number;
   image: string;
+  additional_images?: string[];
 }
 
-export const ProductCard = ({ id, title, description, price, image }: ProductCardProps) => {
+export const ProductCard = ({ id, title, description, price, image, additional_images = [] }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const allImages = [image, ...(additional_images || [])];
+  const hasMultipleImages = allImages.length > 1;
 
   useEffect(() => {
     setImageError(false);
@@ -28,23 +38,29 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
       return;
     }
 
-    const img = new Image();
-    img.onload = () => {
-      console.log(`Image loaded successfully for product ${id}:`, image);
-      setIsLoading(false);
+    const loadImages = async () => {
+      try {
+        await Promise.all(
+          allImages.map((imageUrl) => {
+            return new Promise((resolve, reject) => {
+              const img = new Image();
+              img.onload = resolve;
+              img.onerror = reject;
+              img.src = imageUrl;
+            });
+          })
+        );
+        console.log(`All images loaded successfully for product ${id}`);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(`Failed to load images for product ${id}:`, error);
+        setImageError(true);
+        setIsLoading(false);
+      }
     };
-    img.onerror = (error) => {
-      console.error(`Failed to load image for product ${id}:`, image, error);
-      setImageError(true);
-      setIsLoading(false);
-    };
-    img.src = image;
 
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [image, id]);
+    loadImages();
+  }, [image, id, allImages]);
 
   const getFallbackImage = () => {
     const fallbackImages = [
@@ -66,15 +82,37 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           )}
-          <img
-            src={imageError ? getFallbackImage() : image}
-            alt={title}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              isLoading ? 'opacity-0' : 'opacity-100'
-            }`}
-            onError={() => setImageError(true)}
-            loading="lazy"
-          />
+          {hasMultipleImages ? (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {allImages.map((img, index) => (
+                  <CarouselItem key={index}>
+                    <img
+                      src={imageError ? getFallbackImage() : img}
+                      alt={`${title} - Image ${index + 1}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                        isLoading ? 'opacity-0' : 'opacity-100'
+                      }`}
+                      onError={() => setImageError(true)}
+                      loading="lazy"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
+            </Carousel>
+          ) : (
+            <img
+              src={imageError ? getFallbackImage() : image}
+              alt={title}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                isLoading ? 'opacity-0' : 'opacity-100'
+              }`}
+              onError={() => setImageError(true)}
+              loading="lazy"
+            />
+          )}
         </Link>
       </CardHeader>
       <CardContent className="p-4">
