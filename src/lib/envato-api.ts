@@ -16,7 +16,7 @@ interface EnvatoResponse {
 }
 
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
-  console.log('Fetching Envato items...');
+  console.log('Fetching Envato items with search term:', searchTerm);
   try {
     console.log('Invoking get-envato-key function...');
     const { data: secretData, error: secretError } = await supabase.functions.invoke('get-envato-key');
@@ -31,24 +31,30 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       throw new Error('Envato APIキーが設定されていません。');
     }
 
-    console.log('Successfully retrieved API key, making request to Envato API...');
+    console.log('Making request to Envato API...');
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
         'Authorization': `Bearer ${secretData.ENVATO_API_KEY}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
       params: {
         term: searchTerm,
-        site: 'codecanyon.net'
+        site: 'codecanyon.net',
+        page: 1,
+        page_size: 12
       }
+    });
+    
+    console.log('Received response from Envato API:', {
+      status: response.status,
+      itemCount: response.data.matches?.length || 0
     });
     
     if (!response.data.matches || response.data.matches.length === 0) {
       console.log('No items found in Envato response');
       return [];
     }
-    
-    console.log('Successfully received response from Envato API');
-    console.log('Number of items received:', response.data.matches.length);
     
     return response.data.matches.map(item => ({
       id: String(item.id),

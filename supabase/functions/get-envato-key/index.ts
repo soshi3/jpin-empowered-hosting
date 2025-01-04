@@ -28,7 +28,6 @@ serve(async (req) => {
       )
     }
 
-    console.log('Returning API key to client')
     return new Response(
       JSON.stringify({ ENVATO_API_KEY }),
       { 
