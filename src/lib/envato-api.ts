@@ -94,11 +94,15 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     const imageUrl = getBestImageUrl(detailedItem, item);
 
     // Check for existing product using maybeSingle() instead of single()
-    const { data: existingProduct } = await supabase
+    const { data: existingProduct, error: selectError } = await supabase
       .from('products')
       .select('sales')
       .eq('id', String(item.id))
       .maybeSingle();
+
+    if (selectError) {
+      console.error(`Error checking for existing product ${item.id}:`, selectError);
+    }
 
     const productData = {
       id: String(item.id),
@@ -111,7 +115,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     };
 
     if (existingProduct) {
-      // Update existing product
+      console.log(`Updating existing product ${item.id}`);
       const { error: updateError } = await supabase
         .from('products')
         .update(productData)
@@ -123,7 +127,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
         console.log(`Successfully updated product ${item.id}`);
       }
     } else {
-      // Insert new product
+      console.log(`Inserting new product ${item.id}`);
       const { error: insertError } = await supabase
         .from('products')
         .insert({
