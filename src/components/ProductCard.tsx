@@ -21,6 +21,13 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
     setImageError(false);
     setIsLoading(true);
 
+    if (!image) {
+      console.log(`No image URL provided for product ${id}`);
+      setImageError(true);
+      setIsLoading(false);
+      return;
+    }
+
     // Preload image
     const img = new Image();
     img.onload = () => {
@@ -33,7 +40,6 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
       setIsLoading(false);
     };
     img.src = image;
-    img.crossOrigin = "anonymous";
 
     return () => {
       img.onload = null;
@@ -47,8 +53,18 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
     setIsLoading(false);
   };
 
-  // テック関連の高品質なフォールバック画像を使用
-  const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80";
+  // テック関連の高品質なフォールバック画像を使用（商品IDに基づいて異なる画像を選択）
+  const getFallbackImage = () => {
+    const fallbackImages = [
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80", // tech
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80", // code
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80", // matrix
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80", // code on screen
+    ];
+    // 商品IDに基づいて異なるフォールバック画像を選択
+    const index = parseInt(id, 10) % fallbackImages.length;
+    return fallbackImages[index];
+  };
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
@@ -60,14 +76,13 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
             </div>
           )}
           <img
-            src={imageError ? fallbackImage : image}
+            src={imageError ? getFallbackImage() : image}
             alt={title}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
               isLoading ? 'opacity-0' : 'opacity-100'
             }`}
             onError={handleImageError}
             loading="lazy"
-            crossOrigin="anonymous"
           />
         </div>
       </CardHeader>
