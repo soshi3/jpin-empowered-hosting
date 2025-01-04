@@ -18,6 +18,7 @@ const ProductDetail = () => {
       if (!product) {
         throw new Error("Product not found");
       }
+      console.log('Found product:', product);
       return product;
     },
   });
@@ -49,6 +50,10 @@ const ProductDetail = () => {
 
   const product = products;
 
+  if (!product?.image) {
+    console.error('No image URL found for product:', product);
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -56,12 +61,22 @@ const ProductDetail = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-12">
           <div>
-            <img
-              src={product?.image}
-              alt={product?.title}
-              className="w-full rounded-lg shadow-lg"
-              crossOrigin="anonymous"
-            />
+            {product?.image ? (
+              <img
+                src={product.image}
+                alt={product.title}
+                className="w-full rounded-lg shadow-lg"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  console.error('Error loading image:', e);
+                  e.currentTarget.src = '/placeholder.svg';
+                }}
+              />
+            ) : (
+              <div className="w-full aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
+                <p className="text-gray-500">画像を読み込めませんでした</p>
+              </div>
+            )}
           </div>
           <div>
             <h1 className="text-4xl font-bold mb-4">{product?.title}</h1>
@@ -72,7 +87,6 @@ const ProductDetail = () => {
             <div className="mb-8">
               <h3 className="text-xl font-bold mb-4">主な機能</h3>
               <ul className="space-y-2">
-                {/* Since we don't have features in the current API response, we'll show the description in bullet points */}
                 <li className="flex items-center">
                   <span className="w-2 h-2 bg-secondary rounded-full mr-2" />
                   {product?.description}
