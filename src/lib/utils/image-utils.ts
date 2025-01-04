@@ -32,11 +32,11 @@ export const handleEnvatoError = (error: unknown): never => {
   console.error('Envato API error:', error);
   
   if (error instanceof Error) {
-    if (error.message === 'Network Error') {
-      throw new Error('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+    if (error.message.includes('Network Error') || error.message.includes('ECONNREFUSED')) {
+      throw new Error('インターネット接続を確認してください。サーバーに接続できません。');
     }
     throw error;
   }
   
-  throw new Error('予期せぬエラーが発生しました。');
+  throw new Error('予期せぬエラーが発生しました。しばらく待ってから再度お試しください。');
 };

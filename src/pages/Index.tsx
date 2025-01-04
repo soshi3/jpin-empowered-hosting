@@ -7,7 +7,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { fetchEnvatoItems } from "@/lib/envato-api";
+import { fetchEnvatoItems } from "@/lib/api/envato";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo } from "react";
