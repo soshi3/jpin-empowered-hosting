@@ -18,13 +18,13 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     });
 
     // Ensure we have a valid array of matches
-    if (!Array.isArray(searchResponse?.matches)) {
-      console.warn('No valid matches array in search response');
+    const items: EnvatoItem[] = Array.isArray(searchResponse?.matches) ? searchResponse.matches : [];
+    console.log(`Processing ${items.length} items from search`);
+    
+    if (items.length === 0) {
+      console.warn('No valid items found in search response');
       return [];
     }
-
-    const items: EnvatoItem[] = searchResponse.matches;
-    console.log(`Processing ${items.length} items from search`);
     
     // Process items and handle any individual processing errors
     const processedItems = await Promise.all(
