@@ -42,6 +42,11 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       }
     });
     
+    if (!response.data.matches || response.data.matches.length === 0) {
+      console.log('No items found in Envato response');
+      return [];
+    }
+    
     console.log('Successfully received response from Envato API');
     console.log('Number of items received:', response.data.matches.length);
     

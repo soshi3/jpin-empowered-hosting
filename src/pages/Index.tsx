@@ -4,13 +4,13 @@ import { PricingSection } from "@/components/PricingSection";
 import { ContactForm } from "@/components/ContactForm";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, AlertCircle, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { toast } = useToast();
@@ -65,27 +65,26 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
           {isLoading ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center space-y-4">
+              <Loader className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-muted-foreground">商品を読み込み中...</p>
             </div>
           ) : error ? (
             <Alert variant="destructive" className="max-w-lg mx-auto">
-              <AlertDescription>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="ml-2">
                 {error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。"}
               </AlertDescription>
             </Alert>
-          ) : (
+          ) : products && products.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8">
-              {products?.map((product) => (
+              {products.map((product) => (
                 <ProductCard key={product.id} {...product} />
               ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground">
+              商品が見つかりませんでした。
             </div>
           )}
         </div>
