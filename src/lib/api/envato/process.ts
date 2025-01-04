@@ -29,7 +29,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       additional_images: additional_images,
       sales: (existingProduct?.sales || 0) + 1,
       demo_url: detailedItem.url || null,
-      url: detailedItem.url,
+      url: detailedItem.url || item.preview_url || `https://codecanyon.net/item/${item.id}`,
       live_preview_url: detailedItem.live_site_preview || item.live_preview_url || null,
       category: null,
       tags: [],

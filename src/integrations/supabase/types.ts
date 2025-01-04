@@ -148,6 +148,7 @@ export type Database = {
           tags: string[] | null
           title: string
           updated_at: string
+          url: string
         }
         Insert: {
           additional_images?: string[] | null
@@ -166,6 +167,7 @@ export type Database = {
           tags?: string[] | null
           title: string
           updated_at?: string
+          url?: string
         }
         Update: {
           additional_images?: string[] | null
@@ -184,6 +186,7 @@ export type Database = {
           tags?: string[] | null
           title?: string
           updated_at?: string
+          url?: string
         }
         Relationships: []
       }
