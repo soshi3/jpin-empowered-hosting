@@ -22,6 +22,8 @@ const Index = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => fetchEnvatoItems(),
+    staleTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ
+    cacheTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ保持
     meta: {
       onError: (error: Error) => {
         toast({
