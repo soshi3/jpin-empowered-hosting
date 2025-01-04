@@ -81,8 +81,9 @@ const Index = () => {
       {/* Hero Section with gradient background */}
       <section className="relative min-h-[600px] w-full overflow-hidden">
         <div className="absolute inset-0 bg-white">
-          <div className="absolute inset-0 hero-gradient opacity-100" />
-          <div className="absolute inset-0 mesh-gradient opacity-100" />
+          <div className="stripe-gradient" />
+          <div className="absolute inset-0 hero-gradient opacity-60" />
+          <div className="absolute inset-0 mesh-gradient opacity-40" />
         </div>
         <div className="relative z-10 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
