@@ -47,6 +47,6 @@ export interface ProcessedItem {
   author?: string;
   sales?: number;
   rating?: number;
-  demo_url?: string;
-  live_preview_url?: string;
+  demo_url?: string | null;
+  live_preview_url?: string | null;
 }
