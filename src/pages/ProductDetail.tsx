@@ -58,7 +58,7 @@ const ProductDetail = () => {
     );
   }
 
-  const hasPreviewLinks = products?.demo_url || products?.live_preview_url;
+  const hasPreviewLinks = products?.url || products?.live_preview_url;
 
   return (
     <div className="min-h-screen bg-background">
@@ -110,11 +110,11 @@ const ProductDetail = () => {
               <div className="p-6 bg-muted rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">Demo & Preview</h3>
                 <div className="space-y-3">
-                  {products?.demo_url && (
+                  {products?.url && (
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => window.open(products.demo_url, '_blank')}
+                      onClick={() => window.open(products.url, '_blank')}
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View Demo
