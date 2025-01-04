@@ -23,7 +23,12 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
       console.log("Fetching reviews for product:", productId);
       const { data, error } = await supabase
         .from("reviews")
-        .select("*, profiles(email)")
+        .select(`
+          *,
+          profiles (
+            email
+          )
+        `)
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
 
