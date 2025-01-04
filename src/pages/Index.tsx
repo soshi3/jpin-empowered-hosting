@@ -48,23 +48,29 @@ const Index = () => {
     if (!products) return [];
     
     console.log('Total products before filtering:', products.length);
+    console.log('Current search query:', searchQuery);
     
-    const filtered = products.filter(product => 
-      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    console.log('Products after search filtering:', filtered.length);
-
-    if (activeCategory === "all") {
-      return filtered;
+    let filtered = products;
+    
+    // 検索クエリがある場合のみフィルタリングを適用
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = products.filter(product => {
+        const titleMatch = product.title?.toLowerCase().includes(query);
+        const descriptionMatch = product.description?.toLowerCase().includes(query);
+        return titleMatch || descriptionMatch;
+      });
+      console.log('Products after search filtering:', filtered.length);
     }
 
-    const categorized = categorizeProducts(filtered);
-    console.log('Categorized products:', categorized);
-    console.log(`Products in ${activeCategory} category:`, categorized[activeCategory]?.length || 0);
+    // カテゴリーフィルタリングを適用
+    if (activeCategory !== "all") {
+      const categorized = categorizeProducts(filtered);
+      console.log(`Products in ${activeCategory} category:`, categorized[activeCategory]?.length || 0);
+      return categorized[activeCategory] || [];
+    }
     
-    return categorized[activeCategory] || [];
+    return filtered;
   }, [products, searchQuery, activeCategory]);
 
   return (
