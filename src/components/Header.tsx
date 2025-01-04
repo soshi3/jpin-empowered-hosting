@@ -7,7 +7,7 @@ export const Header = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="flex items-center">
           <img 
-            src="/lovable-uploads/jpin-logo.png" 
+            src="/lovable-uploads/713b48c3-48a4-4835-bbe2-53adcfaa0f40.png" 
             alt="JPIN Solutions" 
             className="h-10 w-auto"
           />
