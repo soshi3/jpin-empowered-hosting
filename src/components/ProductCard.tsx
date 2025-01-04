@@ -45,49 +45,30 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
   };
 
   // Get current image URL with fallback
-  const currentImage = imageError || !image ? getFallbackImage() : image;
+  const currentImage = imageError || !allImages[0] ? getFallbackImage() : allImages[0];
 
   useEffect(() => {
     console.log(`Loading images for product ${id}:`, { image, additional_images, currentImage });
     setImageError(false);
     setIsLoading(true);
 
-    if (!currentImage) {
-      console.log(`No valid image URL for product ${id}, using fallback`);
+    const img = new Image();
+    img.onload = () => {
+      console.log(`Successfully loaded main image for product ${id}`);
+      setIsLoading(false);
+    };
+    img.onerror = () => {
+      console.error(`Failed to load main image for product ${id}`);
       setImageError(true);
       setIsLoading(false);
-      return;
-    }
-
-    const loadImages = async () => {
-      try {
-        await Promise.all(
-          allImages.map((imageUrl) => {
-            return new Promise((resolve, reject) => {
-              const img = new Image();
-              img.onload = () => {
-                console.log(`Successfully loaded image: ${imageUrl}`);
-                resolve(null);
-              };
-              img.onerror = (error) => {
-                console.error(`Failed to load image: ${imageUrl}`, error);
-                reject(error);
-              };
-              img.src = imageUrl;
-            });
-          })
-        );
-        console.log(`All images loaded successfully for product ${id}`);
-        setIsLoading(false);
-      } catch (error) {
-        console.error(`Failed to load images for product ${id}:`, error);
-        setImageError(true);
-        setIsLoading(false);
-      }
     };
+    img.src = currentImage;
 
-    loadImages();
-  }, [id, image, allImages, currentImage]);
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [id, currentImage]);
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
@@ -124,7 +105,7 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
                     {allImages.map((img, index) => (
                       <CarouselItem key={index}>
                         <img
-                          src={imageError ? getFallbackImage() : img}
+                          src={img}
                           alt={`${title} - Image ${index + 1}`}
                           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                             isLoading ? 'opacity-0' : 'opacity-100'
