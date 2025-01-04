@@ -3,8 +3,6 @@ import { Header } from "@/components/Header";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { fetchEnvatoItems } from "@/lib/envato-api";
-import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { ProductImage } from "@/components/ProductImage";
 import { ProductOptions } from "@/components/ProductOptions";
 import { ProductHeader } from "@/components/ProductHeader";
@@ -12,12 +10,6 @@ import { ProductReviews } from "@/components/ProductReviews";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { toast } = useToast();
-  const [selectedOptions, setSelectedOptions] = useState({
-    hosting: false,
-    maintenance: false
-  });
-
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["products", id],
     queryFn: async () => {
@@ -31,24 +23,6 @@ const ProductDetail = () => {
       return product;
     },
   });
-
-  const calculateTotalPrice = () => {
-    let total = products?.price || 0;
-    if (selectedOptions.hosting) total += 9800;
-    if (selectedOptions.maintenance) total += 29800;
-    return total;
-  };
-
-  const handlePurchase = () => {
-    toast({
-      title: "購入手続きを開始します",
-      description: `選択されたオプション：${[
-        "商品",
-        selectedOptions.hosting && "ホスティング",
-        selectedOptions.maintenance && "保守運用"
-      ].filter(Boolean).join(", ")}`,
-    });
-  };
 
   if (isLoading) {
     return (
@@ -68,12 +42,12 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-red-600">
-              エラーが発生しました
+              Error occurred
             </h2>
             <p className="mt-2 text-gray-600">
-              商品の取得に失敗しました。
+              Failed to fetch product details.
               <br />
-              時間をおいて再度お試しください。
+              Please try again later.
             </p>
           </div>
         </div>
@@ -89,13 +63,7 @@ const ProductDetail = () => {
           <ProductImage product={products} />
           <div>
             <ProductHeader product={products} />
-            <ProductOptions
-              selectedOptions={selectedOptions}
-              setSelectedOptions={setSelectedOptions}
-              totalPrice={calculateTotalPrice()}
-              basePrice={products?.price}
-              onPurchase={handlePurchase}
-            />
+            <ProductOptions basePrice={products?.price} />
           </div>
         </div>
         <ProductReviews productId={id || ""} />

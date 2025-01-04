@@ -52,7 +52,7 @@ export const ProductOptions = ({ basePrice = 0 }: ProductOptionsProps) => {
               <Label htmlFor="hosting" className="text-base font-semibold flex items-center gap-2">
                 <Server className="w-4 h-4" />
                 Hosting
-                <Badge variant="outline">${9,800}/month</Badge>
+                <Badge variant="outline">${9800}/month</Badge>
               </Label>
               <p className="text-sm text-muted-foreground">
                 Stable hosting service on high-performance servers
@@ -77,7 +77,7 @@ export const ProductOptions = ({ basePrice = 0 }: ProductOptionsProps) => {
               <Label htmlFor="maintenance" className="text-base font-semibold flex items-center gap-2">
                 <Shield className="w-4 h-4" />
                 Maintenance
-                <Badge variant="outline">${29,800}/month</Badge>
+                <Badge variant="outline">${29800}/month</Badge>
               </Label>
               <p className="text-sm text-muted-foreground">
                 24/7 monitoring and technical support

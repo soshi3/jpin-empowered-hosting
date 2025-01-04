@@ -45,10 +45,7 @@ export const CategoryFilter = ({ onCategoryChange }: CategoryFilterProps) => {
         onClick={() => handleCategoryClick("all")}
       >
         <ArrowRight className="w-6 h-6" />
-        <div className="flex flex-col text-sm">
-          <span>すべて</span>
-          <span>All</span>
-        </div>
+        <span className="text-sm">All</span>
       </Button>
       {PRODUCT_CATEGORIES.map((category) => {
         const Icon = category.icon;
@@ -63,10 +60,7 @@ export const CategoryFilter = ({ onCategoryChange }: CategoryFilterProps) => {
             onClick={() => handleCategoryClick(category.id)}
           >
             <Icon className="w-6 h-6" />
-            <div className="flex flex-col text-sm">
-              <span>{category.name}</span>
-              <span>{category.nameEn}</span>
-            </div>
+            <span className="text-sm">{category.name}</span>
           </Button>
         );
       })}
