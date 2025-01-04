@@ -52,7 +52,7 @@ export const ProductOptions = ({
                 <Label htmlFor="hosting" className="text-base font-semibold flex items-center gap-2">
                   <Server className="w-4 h-4" />
                   ホスティング
-                  <Badge variant="outline">¥9,800/月</Badge>
+                  <Badge variant="outline">$9,800/month</Badge>
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   高性能サーバーでの安定したホスティングサービス
@@ -70,7 +70,7 @@ export const ProductOptions = ({
                 <Label htmlFor="maintenance" className="text-base font-semibold flex items-center gap-2">
                   <Shield className="w-4 h-4" />
                   保守運用
-                  <Badge variant="outline">¥29,800/月</Badge>
+                  <Badge variant="outline">$29,800/month</Badge>
                 </Label>
                 <p className="text-sm text-muted-foreground">
                   24時間365日の監視と技術サポート
@@ -85,14 +85,14 @@ export const ProductOptions = ({
         <div>
           <p className="text-sm text-gray-600">商品価格</p>
           <p className="text-3xl font-bold text-primary">
-            ¥{basePrice?.toLocaleString()}
+            ${basePrice?.toLocaleString()}
           </p>
         </div>
         {(selectedOptions.hosting || selectedOptions.maintenance) && (
           <div className="text-right">
             <p className="text-sm text-gray-600">オプション込み合計</p>
             <p className="text-3xl font-bold text-primary">
-              ¥{totalPrice.toLocaleString()}
+              ${totalPrice.toLocaleString()}
             </p>
           </div>
         )}

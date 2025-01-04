@@ -98,7 +98,7 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
             Maintenance Available
           </Badge>
         </div>
-        <p className="text-xl font-bold text-primary">¥{price.toLocaleString()}</p>
+        <p className="text-xl font-bold text-primary">${price.toLocaleString()}</p>
       </CardContent>
       <CardFooter className="p-4 pt-0">
         <Link to={`/product/${id}`} className="w-full">

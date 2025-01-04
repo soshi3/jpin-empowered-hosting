@@ -52,7 +52,7 @@ export const PricingSection = () => {
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <p className="text-3xl font-bold mt-4">
-                  ¥{plan.price.toLocaleString()}<span className="text-sm font-normal">/month</span>
+                  ${plan.price.toLocaleString()}<span className="text-sm font-normal">/month</span>
                 </p>
               </CardHeader>
               <CardContent>
