@@ -22,23 +22,16 @@ const ProductDetail = () => {
         throw new Error("Product not found");
       }
       console.log('Found product:', product);
-      const imageUrl = product.image ? 
-        (typeof product.image === 'object' ? product.image.value : product.image) 
-        : null;
-      console.log('Processed image URL:', imageUrl);
-      return {
-        ...product,
-        image: imageUrl
-      };
+      return product;
     },
   });
 
   useEffect(() => {
     if (products?.image) {
-      console.log('Attempting to load image:', products.image);
+      console.log('Loading product image:', products.image);
       const img = new Image();
       img.onload = () => {
-        console.log('Product image loaded successfully:', products.image);
+        console.log('Product image loaded successfully');
         setImageLoading(false);
         setImageError(false);
       };
@@ -92,10 +85,6 @@ const ProductDetail = () => {
 
   const product = products;
   const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80";
-
-  if (!product?.image) {
-    console.error('No image URL found for product:', product);
-  }
 
   return (
     <div className="min-h-screen">
