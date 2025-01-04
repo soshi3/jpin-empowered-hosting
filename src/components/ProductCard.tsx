@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 
 interface ProductCardProps {
   id: string;
@@ -11,10 +12,23 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ id, title, description, price, image }: ProductCardProps) => {
+  const [imageError, setImageError] = useState(false);
+
+  const handleImageError = () => {
+    console.error(`Failed to load image for product ${id}:`, image);
+    setImageError(true);
+  };
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
-        <img src={image} alt={title} className="w-full h-48 object-cover" />
+        <img
+          src={imageError ? "/placeholder.svg" : image}
+          alt={title}
+          className="w-full h-48 object-cover"
+          onError={handleImageError}
+          loading="lazy"
+        />
       </CardHeader>
       <CardContent className="p-4">
         <CardTitle className="mb-2">{title}</CardTitle>
