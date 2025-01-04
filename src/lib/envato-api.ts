@@ -27,26 +27,40 @@ const getEnvatoApiKey = async (): Promise<string> => {
 
 const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<EnvatoItem[]> => {
   console.log('Making request to Envato API with search term:', searchTerm);
+  const allItems: EnvatoItem[] = [];
+  const pageSize = 100; // 1ページあたりの最大数
+  const maxPages = 5; // 取得する最大ページ数
+
   try {
-    const searchResponse = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': 'application/json',
-      },
-      params: {
-        term: searchTerm,
-        site: 'codecanyon.net',
-        page: 1,
-        page_size: 12
+    for (let page = 1; page <= maxPages; page++) {
+      console.log(`Fetching page ${page} of Envato items...`);
+      const searchResponse = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Accept': 'application/json',
+        },
+        params: {
+          term: searchTerm,
+          site: 'codecanyon.net',
+          page: page,
+          page_size: pageSize
+        }
+      });
+
+      const items = searchResponse.data.matches || [];
+      if (items.length === 0) {
+        break; // 結果がない場合は終了
       }
-    });
 
-    console.log('Received response from Envato API:', {
-      status: searchResponse.status,
-      itemCount: searchResponse.data.matches?.length || 0
-    });
+      allItems.push(...items);
+      console.log(`Retrieved ${items.length} items from page ${page}`);
 
-    return searchResponse.data.matches || [];
+      // APIレート制限に配慮して少し待機
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    console.log('Total items retrieved:', allItems.length);
+    return allItems;
   } catch (error) {
     return handleEnvatoError(error);
   }
@@ -103,7 +117,12 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   try {
     const apiKey = await getEnvatoApiKey();
     const items = await searchEnvatoItems(apiKey, searchTerm);
-    const processedItems = await Promise.all(items.map(item => processEnvatoItem(item, apiKey)));
+    
+    // 並列処理で詳細情報を取得
+    const processedItems = await Promise.all(
+      items.map(item => processEnvatoItem(item, apiKey))
+    );
+    
     console.log('Successfully processed all items:', processedItems.length);
     return processedItems;
   } catch (error) {
