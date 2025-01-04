@@ -32,12 +32,6 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }
 
     const apiKey = secretData.ENVATO_API_KEY;
-    console.log('API Key format check:', {
-      firstFourChars: apiKey.substring(0, 4),
-      lastFourChars: apiKey.substring(apiKey.length - 4),
-      length: apiKey.length
-    });
-
     console.log('Making request to Envato API...');
     const response = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
       headers: {
@@ -64,18 +58,24 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }
 
     return response.data.matches.map(item => {
+      // 画像URLの選択ロジックを改善
+      const imageUrl = item.preview_url || item.thumbnail_url;
       console.log('Processing item:', {
         id: item.id,
-        preview_url: item.preview_url,
-        thumbnail_url: item.thumbnail_url
+        name: item.name,
+        imageUrl: imageUrl
       });
-      
+
+      if (!imageUrl) {
+        console.warn(`No image URL found for item ${item.id}`);
+      }
+
       return {
         id: String(item.id),
         title: item.name,
         description: item.description,
         price: Math.round(item.price_cents / 100),
-        image: item.preview_url || item.thumbnail_url || null
+        image: imageUrl || null
       };
     });
   } catch (error) {
