@@ -37,6 +37,22 @@ export default {
         sans: ["Inter", "Noto Sans JP", "sans-serif"],
         heading: ["Inter", "sans-serif"],
       },
+      keyframes: {
+        "gradient-x": {
+          "0%, 100%": {
+            "background-position": "0% 50%",
+          },
+          "50%": {
+            "background-position": "100% 50%",
+          },
+        },
+      },
+      animation: {
+        "gradient-x": "gradient-x 15s ease infinite",
+      },
+      backgroundSize: {
+        "400%": "400% 400%",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -3,6 +3,7 @@ import { searchEnvatoItems } from './search';
 import { processEnvatoItem } from './process';
 import { supabase } from '@/integrations/supabase/client';
 import axios from 'axios';
+import { EnvatoItem } from '../../types/envato';
 
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items with search term:', searchTerm);
@@ -10,14 +11,39 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     const apiKey = await getEnvatoApiKey();
     console.log('Successfully retrieved API key');
 
-    const items = await searchEnvatoItems(apiKey, searchTerm);
-    console.log(`Retrieved ${items.length} items from search`);
+    const searchResponse = await searchEnvatoItems(apiKey, searchTerm);
+    console.log('Search response received:', {
+      hasMatches: !!searchResponse?.matches,
+      matchesLength: searchResponse?.matches?.length
+    });
+
+    // Ensure we have a valid array of matches
+    const items: EnvatoItem[] = Array.isArray(searchResponse?.matches) ? searchResponse.matches : [];
+    console.log(`Processing ${items.length} items from search`);
     
+    if (items.length === 0) {
+      console.warn('No valid items found in search response');
+      return [];
+    }
+    
+    // Process items and handle any individual processing errors
     const processedItems = await Promise.all(
-      items.map(item => processEnvatoItem(item, apiKey))
+      items.map(async (item) => {
+        try {
+          console.log(`Processing item ${item.id}: ${item.name}`);
+          return await processEnvatoItem(item, apiKey);
+        } catch (error) {
+          console.error(`Error processing item ${item.id}:`, error);
+          return null;
+        }
+      })
     );
-    console.log(`Processed ${processedItems.length} items`);
+
+    // Filter out any null results from failed processing
+    const validProcessedItems = processedItems.filter(item => item !== null);
+    console.log(`Successfully processed ${validProcessedItems.length} items`);
     
+    // Fetch sorted products from Supabase
     const { data: sortedProducts, error } = await supabase
       .from('products')
       .select('*')
@@ -25,13 +51,13 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
 
     if (error) {
       console.error('Error fetching sorted products:', error);
-      return processedItems;
+      return validProcessedItems;
     }
 
     console.log('Successfully retrieved sorted products:', sortedProducts?.length);
-    return sortedProducts || processedItems;
+    return sortedProducts || validProcessedItems;
   } catch (error) {
-    console.error('Error fetching Envato items:', error);
+    console.error('Error in fetchEnvatoItems:', error);
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 404) {
         throw new Error('Envato APIのエンドポイントにアクセスできません。APIキーの権限を確認してください。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
