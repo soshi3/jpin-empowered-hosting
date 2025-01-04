@@ -84,25 +84,25 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     // Try to get preview image from different possible locations in the API response
     let imageUrl = null;
 
-    // Try v3 API specific preview URLs first
-    if (itemResponse.data.preview_url) {
+    // First try the main preview URL from v3 API
+    if (itemResponse.data.previews && itemResponse.data.previews.landscape_preview) {
+      imageUrl = itemResponse.data.previews.landscape_preview.landscape_url;
+      console.log(`Found landscape preview URL for item ${item.id}:`, imageUrl);
+    }
+    // Then try the preview images array
+    else if (Array.isArray(itemResponse.data.preview_images) && itemResponse.data.preview_images.length > 0) {
+      imageUrl = itemResponse.data.preview_images[0].landscape_url;
+      console.log(`Found preview image URL for item ${item.id}:`, imageUrl);
+    }
+    // Then try the preview URL directly
+    else if (itemResponse.data.preview_url) {
       imageUrl = itemResponse.data.preview_url;
-      console.log(`Found preview_url in v3 API response for item ${item.id}:`, imageUrl);
+      console.log(`Found preview_url for item ${item.id}:`, imageUrl);
     }
     // Then try live preview URL
     else if (itemResponse.data.live_preview_url) {
       imageUrl = itemResponse.data.live_preview_url;
-      console.log(`Found live_preview_url in v3 API response for item ${item.id}:`, imageUrl);
-    }
-    // Then try preview object
-    else if (itemResponse.data.preview) {
-      const preview = itemResponse.data.preview;
-      imageUrl = preview.landscape_url || 
-                preview.icon_with_landscape_preview?.landscape_url ||
-                preview.icon_url;
-      if (imageUrl) {
-        console.log(`Found image URL in preview object for item ${item.id}:`, imageUrl);
-      }
+      console.log(`Found live_preview_url for item ${item.id}:`, imageUrl);
     }
     // Finally, fall back to the search response URLs
     if (!imageUrl) {
