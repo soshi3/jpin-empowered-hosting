@@ -136,10 +136,12 @@ export type Database = {
           author: string | null
           category: string | null
           created_at: string
+          demo_url: string | null
           description: string
           envato_id: number | null
           id: string
           image: string
+          live_preview_url: string | null
           price: number
           rating: number | null
           sales: number | null
@@ -152,10 +154,12 @@ export type Database = {
           author?: string | null
           category?: string | null
           created_at?: string
+          demo_url?: string | null
           description: string
           envato_id?: number | null
           id: string
           image: string
+          live_preview_url?: string | null
           price: number
           rating?: number | null
           sales?: number | null
@@ -168,10 +172,12 @@ export type Database = {
           author?: string | null
           category?: string | null
           created_at?: string
+          demo_url?: string | null
           description?: string
           envato_id?: number | null
           id?: string
           image?: string
+          live_preview_url?: string | null
           price?: number
           rating?: number | null
           sales?: number | null
