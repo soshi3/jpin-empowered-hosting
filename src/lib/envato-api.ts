@@ -78,25 +78,49 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
       }
     });
 
-    // Get preview images from the item response
-    const previewImages = itemResponse.data.previews?.map((preview: any) => preview.landscape_url).filter(Boolean);
-    const previewImage = previewImages?.[0];
+    // Log the structure of the response to debug
+    console.log(`Item response structure for ${item.id}:`, {
+      hasPreviewsArray: Array.isArray(itemResponse.data.previews),
+      previewsType: typeof itemResponse.data.previews,
+      preview: itemResponse.data.preview
+    });
 
-    // Get the best available image URL
-    let imageUrl = previewImage;
-    if (!imageUrl) {
-      // Try to get image from the search response
+    // Try to get preview image from different possible locations in the API response
+    let imageUrl = null;
+
+    // Try preview.landscape_url first
+    if (itemResponse.data.preview?.landscape_url) {
+      imageUrl = itemResponse.data.preview.landscape_url;
+      console.log(`Found landscape_url in preview for item ${item.id}:`, imageUrl);
+    }
+    // Then try preview.icon_with_landscape_preview.landscape_url
+    else if (itemResponse.data.preview?.icon_with_landscape_preview?.landscape_url) {
+      imageUrl = itemResponse.data.preview.icon_with_landscape_preview.landscape_url;
+      console.log(`Found landscape_url in icon_with_landscape_preview for item ${item.id}:`, imageUrl);
+    }
+    // Then try preview.icon_url
+    else if (itemResponse.data.preview?.icon_url) {
+      imageUrl = itemResponse.data.preview.icon_url;
+      console.log(`Found icon_url in preview for item ${item.id}:`, imageUrl);
+    }
+    // Finally, fall back to the search response URLs
+    else {
       imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
+      console.log(`Using fallback URL from search response for item ${item.id}:`, imageUrl);
     }
 
-    console.log(`Final image URL for item ${item.id}:`, imageUrl || 'No image found');
+    // If no image URL was found, use the default fallback
+    if (!imageUrl) {
+      console.log(`No image URL found for item ${item.id}, using default fallback`);
+      imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+    }
 
     return {
       id: String(item.id),
       title: item.name,
       description: item.description,
       price: Math.round(item.price_cents / 100),
-      image: imageUrl || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
+      image: imageUrl
     };
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
@@ -106,7 +130,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
       title: item.name,
       description: item.description,
       price: Math.round(item.price_cents / 100),
-      image: item.preview_url || item.thumbnail_url || 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
+      image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
     };
   }
 };
