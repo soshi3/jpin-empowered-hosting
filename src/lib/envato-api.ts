@@ -22,6 +22,9 @@ const getEnvatoApiKey = async (): Promise<string> => {
     return secretData.ENVATO_API_KEY;
   } catch (error) {
     console.error('Failed to get Envato API key:', error);
+    if (axios.isAxiosError(error) && error.message === 'Network Error') {
+      throw new Error('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+    }
     throw error;
   }
 };
@@ -55,6 +58,9 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
     return searchResponse.data.matches;
   } catch (error) {
     console.error('Error searching Envato items:', error);
+    if (axios.isAxiosError(error) && error.message === 'Network Error') {
+      throw new Error('Envato APIへの接続に失敗しました。インターネット接続を確認してください。');
+    }
     throw error;
   }
 };
