@@ -48,14 +48,12 @@ const ProductDetail = () => {
         setImageLoading(false);
       };
       img.src = products.image;
-      img.crossOrigin = "anonymous";
 
       return () => {
         img.onload = null;
         img.onerror = null;
       };
     } else {
-      // If there's no image, set loading to false and error to true
       setImageLoading(false);
       setImageError(true);
     }
@@ -78,8 +76,14 @@ const ProductDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600">エラーが発生しました</h2>
-            <p className="mt-2 text-gray-600">商品の取得に失敗しました。時間をおいて再度お試しください。</p>
+            <h2 className="text-2xl font-bold text-red-600">
+              エラーが発生しました
+            </h2>
+            <p className="mt-2 text-gray-600">
+              商品の取得に失敗しました。
+              <br />
+              時間をおいて再度お試しください。
+            </p>
           </div>
         </div>
       </div>
@@ -111,7 +115,6 @@ const ProductDetail = () => {
               className={`w-full rounded-lg shadow-lg transition-opacity duration-300 ${
                 imageLoading ? 'opacity-0' : 'opacity-100'
               }`}
-              crossOrigin="anonymous"
               onError={() => {
                 console.error('Error loading image, falling back to placeholder');
                 setImageError(true);
@@ -120,18 +123,24 @@ const ProductDetail = () => {
             />
           </div>
           <div>
-            <h1 className="text-4xl font-bold mb-4">{product?.title}</h1>
-            <p className="text-xl text-gray-600 mb-6">{product?.description}</p>
+            <h1 className="text-4xl font-bold mb-4">
+              {product?.title}
+            </h1>
+            <p className="text-xl text-gray-600 mb-6 whitespace-pre-line">
+              {product?.description?.split('. ').join('.\n')}
+            </p>
             <p className="text-3xl font-bold text-primary mb-8">
               ¥{product?.price?.toLocaleString()}
             </p>
             <div className="mb-8">
               <h3 className="text-xl font-bold mb-4">主な機能</h3>
-              <ul className="space-y-2">
-                <li className="flex items-center">
-                  <span className="w-2 h-2 bg-secondary rounded-full mr-2" />
-                  {product?.description}
-                </li>
+              <ul className="space-y-4">
+                {product?.description?.split('. ').map((feature, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="w-2 h-2 bg-secondary rounded-full mr-2 mt-2" />
+                    <span>{feature.trim()}</span>
+                  </li>
+                ))}
               </ul>
             </div>
             <Button size="lg" className="w-full md:w-auto">
