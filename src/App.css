@@ -36,26 +36,30 @@
 .hero-gradient {
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(45deg, rgba(37, 99, 235, 0.4) 15%, transparent 15%) -50px 0,
-    linear-gradient(-45deg, rgba(16, 185, 129, 0.4) 15%, transparent 15%) -50px 0,
-    linear-gradient(45deg, transparent 85%, rgba(37, 99, 235, 0.4) 85%) -50px 0,
-    linear-gradient(-45deg, transparent 85%, rgba(16, 185, 129, 0.4) 85%) -50px 0;
-  background-size: 120px 120px;
+  background: linear-gradient(
+    135deg,
+    rgba(37, 99, 235, 0.6),
+    rgba(16, 185, 129, 0.6)
+  );
   z-index: 1;
   mix-blend-mode: overlay;
 }
 
+/* Animated gradient background inspired by Stripe */
 .stripe-gradient {
   position: absolute;
   inset: 0;
-  background: 
-    linear-gradient(60deg, transparent 20%, rgba(255, 51, 102, 0.3) 20%) -40px 0,
-    linear-gradient(-60deg, transparent 20%, rgba(104, 109, 224, 0.3) 20%) -40px 0,
-    linear-gradient(60deg, rgba(190, 46, 221, 0.3) 80%, transparent 80%) -40px 0,
-    linear-gradient(-60deg, rgba(255, 51, 102, 0.3) 80%, transparent 80%) -40px 0;
-  background-size: 100px 100px;
-  opacity: 0.35;
+  background: linear-gradient(
+    125deg,
+    #ff3366,
+    #ff6b6b,
+    #4834d4,
+    #686de0,
+    #be2edd,
+    #ff3366
+  );
+  background-size: 400% 400%;
+  opacity: 0.45;
   animation: stripeGradient 15s ease infinite;
   z-index: 0;
 }
@@ -66,8 +70,8 @@
   inset: 0;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(255, 255, 255, 0.3) 0%,
-    transparent 60%
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 50%
   );
   animation: pulseGlow 8s ease-in-out infinite alternate;
 }
@@ -86,11 +90,11 @@
 
 @keyframes pulseGlow {
   0% {
-    opacity: 0.2;
+    opacity: 0.3;
     transform: scale(1);
   }
   100% {
-    opacity: 0.6;
+    opacity: 0.7;
     transform: scale(1.2);
   }
 }
