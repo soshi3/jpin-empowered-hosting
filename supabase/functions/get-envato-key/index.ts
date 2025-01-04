@@ -12,7 +12,7 @@ serve(async (req) => {
 
   try {
     const ENVATO_API_KEY = Deno.env.get('ENVATO_API_KEY')
-    console.log('Retrieved ENVATO_API_KEY:', ENVATO_API_KEY ? 'Present' : 'Missing')
+    console.log('Retrieved ENVATO_API_KEY:', ENVATO_API_KEY ? 'Present (length: ' + ENVATO_API_KEY.length + ')' : 'Missing')
     
     if (!ENVATO_API_KEY) {
       console.error('Envato API key not found in environment variables')
@@ -28,6 +28,7 @@ serve(async (req) => {
       )
     }
 
+    console.log('Returning API key to client')
     return new Response(
       JSON.stringify({ ENVATO_API_KEY }),
       { 

@@ -42,7 +42,8 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       }
     });
     
-    console.log('Envato API response:', response.data);
+    console.log('Successfully received response from Envato API');
+    console.log('Number of items received:', response.data.matches.length);
     
     return response.data.matches.map(item => ({
       id: String(item.id),
@@ -53,8 +54,14 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }));
   } catch (error) {
     console.error('Error fetching Envato items:', error);
-    if (axios.isAxiosError(error) && error.response?.status === 403) {
-      throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
+    if (axios.isAxiosError(error)) {
+      if (error.response?.status === 403) {
+        console.error('Received 403 error from Envato API:', error.response.data);
+        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
+      }
+      if (error.response?.data) {
+        console.error('API Error response:', error.response.data);
+      }
     }
     throw error;
   }
