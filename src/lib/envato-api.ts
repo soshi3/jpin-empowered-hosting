@@ -69,7 +69,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
     
-    // Get detailed item information
+    // Get detailed item information using v3 API
     console.log(`Fetching detailed information for item ${item.id}`);
     const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
       headers: {
@@ -78,41 +78,41 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
       }
     });
 
-    // Log the structure of the response to debug
-    console.log(`Item response structure for ${item.id}:`, {
-      hasPreviewsArray: Array.isArray(itemResponse.data.previews),
-      previewsType: typeof itemResponse.data.previews,
-      preview: itemResponse.data.preview
-    });
+    // Log the full response for debugging
+    console.log(`Full item response for ${item.id}:`, JSON.stringify(itemResponse.data, null, 2));
 
     // Try to get preview image from different possible locations in the API response
     let imageUrl = null;
 
-    // Try preview.landscape_url first
-    if (itemResponse.data.preview?.landscape_url) {
-      imageUrl = itemResponse.data.preview.landscape_url;
-      console.log(`Found landscape_url in preview for item ${item.id}:`, imageUrl);
+    // Try v3 API specific preview URLs first
+    if (itemResponse.data.preview_url) {
+      imageUrl = itemResponse.data.preview_url;
+      console.log(`Found preview_url in v3 API response for item ${item.id}:`, imageUrl);
     }
-    // Then try preview.icon_with_landscape_preview.landscape_url
-    else if (itemResponse.data.preview?.icon_with_landscape_preview?.landscape_url) {
-      imageUrl = itemResponse.data.preview.icon_with_landscape_preview.landscape_url;
-      console.log(`Found landscape_url in icon_with_landscape_preview for item ${item.id}:`, imageUrl);
+    // Then try live preview URL
+    else if (itemResponse.data.live_preview_url) {
+      imageUrl = itemResponse.data.live_preview_url;
+      console.log(`Found live_preview_url in v3 API response for item ${item.id}:`, imageUrl);
     }
-    // Then try preview.icon_url
-    else if (itemResponse.data.preview?.icon_url) {
-      imageUrl = itemResponse.data.preview.icon_url;
-      console.log(`Found icon_url in preview for item ${item.id}:`, imageUrl);
+    // Then try preview object
+    else if (itemResponse.data.preview) {
+      const preview = itemResponse.data.preview;
+      imageUrl = preview.landscape_url || 
+                preview.icon_with_landscape_preview?.landscape_url ||
+                preview.icon_url;
+      if (imageUrl) {
+        console.log(`Found image URL in preview object for item ${item.id}:`, imageUrl);
+      }
     }
     // Finally, fall back to the search response URLs
-    else {
-      imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
-      console.log(`Using fallback URL from search response for item ${item.id}:`, imageUrl);
-    }
-
-    // If no image URL was found, use the default fallback
     if (!imageUrl) {
-      console.log(`No image URL found for item ${item.id}, using default fallback`);
-      imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+      imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
+      if (imageUrl) {
+        console.log(`Using fallback URL from search response for item ${item.id}:`, imageUrl);
+      } else {
+        console.log(`No image URL found for item ${item.id}, using default fallback`);
+        imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
+      }
     }
 
     return {
