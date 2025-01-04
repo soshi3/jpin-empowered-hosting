@@ -7,6 +7,8 @@ interface EnvatoItem {
   description: string;
   price_cents: number;
   preview_url: string;
+  author_username: string;
+  thumbnail_url: string;
 }
 
 interface EnvatoResponse {
@@ -56,6 +58,8 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       status: response.status,
       itemCount: response.data.matches?.length || 0
     });
+
+    console.log('Sample item data:', response.data.matches[0]);
     
     if (!response.data.matches || response.data.matches.length === 0) {
       console.log('No items found in Envato response');
@@ -67,7 +71,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       title: item.name,
       description: item.description,
       price: Math.round(item.price_cents / 100),
-      image: item.preview_url
+      image: item.thumbnail_url || item.preview_url // Use thumbnail_url as primary, fallback to preview_url
     }));
   } catch (error) {
     console.error('Error fetching Envato items:', error);
