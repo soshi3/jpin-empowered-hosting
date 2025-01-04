@@ -62,7 +62,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 403) {
         console.error('Received 403 error from Envato API:', error.response.data);
-        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。');
+        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
       }
       if (error.response?.data) {
         console.error('API Error response:', error.response.data);
