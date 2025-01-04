@@ -40,3 +40,54 @@
 .read-the-docs {
   color: #888;
 }
+
+.hero-gradient {
+  background: linear-gradient(
+    60deg,
+    rgba(37, 99, 235, 0.1) 5%,
+    rgba(16, 185, 129, 0.1) 95%
+  );
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-gradient::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(37, 99, 235, 0.1) 0%,
+    rgba(16, 185, 129, 0.1) 50%,
+    transparent 100%
+  );
+  animation: rotate 20s linear infinite;
+}
+
+.hero-gradient::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at center,
+    rgba(16, 185, 129, 0.1) 0%,
+    rgba(37, 99, 235, 0.1) 50%,
+    transparent 100%
+  );
+  animation: rotate 30s linear infinite reverse;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

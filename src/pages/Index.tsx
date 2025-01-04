@@ -32,8 +32,9 @@ const Index = () => {
         selectedCategory === "all" ? "wordpress" : `wordpress ${selectedCategory}`,
         pageParam
       ),
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.hasMore ? allPages.length + 1 : undefined;
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      return lastPage.hasMore ? lastPage.currentPage + 1 : undefined;
     },
     meta: {
       onError: (error: Error) => {
@@ -73,30 +74,26 @@ const Index = () => {
 
   const allProducts = data?.pages.flatMap(page => page.items) ?? [];
 
-  console.log('Products data:', allProducts);
-  console.log('Selected category:', selectedCategory);
-  console.log('Error:', error);
-
   return (
     <div className="min-h-screen">
       <Header />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary to-secondary text-white py-24">
-        <div className="container mx-auto px-4">
+      {/* Hero Section with new gradient background */}
+      <section className="hero-gradient relative py-24">
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-white/90">
+            <p className="text-xl mb-8 text-gray-600 dark:text-gray-300">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90">
+              <Button size="lg" variant="default" className="bg-primary hover:bg-primary/90">
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20">
+              <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-primary/10">
                 お問い合わせ
               </Button>
             </div>

@@ -1,128 +1,81 @@
 import axios from 'axios';
-import { supabase } from '@/integrations/supabase/client';
-import { EnvatoItem, EnvatoResponse, ProcessedItem, EnvatoDetailedItem } from './types/envato';
-import { getBestImageUrl, handleEnvatoError } from './utils/image-utils';
+import { ProcessedItem } from './types/envato';
 
-const getEnvatoApiKey = async (): Promise<string> => {
-  console.log('Invoking get-envato-key function...');
+interface EnvatoResponse {
+  matches: Array<{
+    id: number;
+    name: string;
+    author_username: string;
+    summary: string;
+    description: string;
+    updated_at: string;
+    number_of_sales: number;
+    price_cents: number;
+    preview_url: string;
+    classification: string;
+    wordpress_theme_metadata?: {
+      theme_name: string;
+      description: string;
+      tags: string[];
+    };
+  }>;
+  total_items: number;
+  took: number;
+}
+
+interface ProcessedEnvatoResponse {
+  items: ProcessedItem[];
+  total: number;
+  hasMore: boolean;
+  currentPage: number;
+}
+
+const ITEMS_PER_PAGE = 12;
+
+export const fetchEnvatoItems = async (
+  searchQuery: string,
+  page: number = 1
+): Promise<ProcessedEnvatoResponse> => {
+  console.log(`Fetching Envato items for query: ${searchQuery}, page: ${page}`);
+  
   try {
-    const { data: secretData, error: secretError } = await supabase.functions.invoke('get-envato-key');
-    
-    if (secretError) {
-      console.error('Error invoking get-envato-key function:', secretError);
-      throw new Error('Envato APIキーの取得に失敗しました。サポートにお問い合わせください。');
-    }
-
-    if (!secretData?.ENVATO_API_KEY) {
-      console.error('No Envato API key found in response:', secretData);
-      throw new Error('Envato APIキーが設定されていません。');
-    }
-
-    console.log('Successfully retrieved Envato API key');
-    return secretData.ENVATO_API_KEY;
-  } catch (error) {
-    return handleEnvatoError(error);
-  }
-};
-
-const searchEnvatoItems = async (apiKey: string, searchTerm: string, page: number = 1): Promise<EnvatoResponse> => {
-  console.log('Making request to Envato API with search term:', searchTerm, 'page:', page);
-  try {
-    const searchResponse = await axios.get<EnvatoResponse>('https://api.envato.com/v1/discovery/search/search/item', {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': 'application/json',
-      },
+    const response = await axios.get<{ data: string }>('/api/get-envato-items', {
       params: {
-        term: searchTerm,
-        site: 'codecanyon.net',
-        page: page,
-        page_size: 12
+        search_query: searchQuery,
+        page
       }
     });
 
-    console.log('Received response from Envato API:', {
-      status: searchResponse.status,
-      itemCount: searchResponse.data.matches?.length || 0,
-      totalItems: searchResponse.data.total_items || 0
-    });
+    const envatoData: EnvatoResponse = JSON.parse(response.data.data);
+    console.log('Envato API Response:', envatoData);
 
-    return searchResponse.data;
-  } catch (error) {
-    return handleEnvatoError(error);
-  }
-};
+    const processedItems: ProcessedItem[] = envatoData.matches.map(item => ({
+      id: item.id,
+      title: item.wordpress_theme_metadata?.theme_name || item.name,
+      description: item.wordpress_theme_metadata?.description || item.description,
+      author: item.author_username,
+      updatedAt: new Date(item.updated_at),
+      sales: item.number_of_sales,
+      price: item.price_cents / 100,
+      previewUrl: item.preview_url,
+      tags: item.wordpress_theme_metadata?.tags || [],
+      category: item.classification
+    }));
 
-const getDetailedItemInfo = async (itemId: number, apiKey: string): Promise<EnvatoDetailedItem> => {
-  console.log(`Fetching detailed information for item ${itemId}`);
-  try {
-    const response = await axios.get<EnvatoDetailedItem>(
-      `https://api.envato.com/v3/market/catalog/item?id=${itemId}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Accept': 'application/json',
-        }
-      }
-    );
+    const totalItems = envatoData.total_items;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    const hasMore = page < totalPages;
 
-    console.log(`Received detailed info for item ${itemId}`);
-    return response.data;
-  } catch (error) {
-    return handleEnvatoError(error);
-  }
-};
+    console.log(`Processed ${processedItems.length} items. Has more: ${hasMore}`);
 
-const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<ProcessedItem> => {
-  try {
-    console.log(`Processing item ${item.id}: ${item.name}`);
-    const detailedItem = await getDetailedItemInfo(item.id, apiKey);
-    const imageUrl = getBestImageUrl(detailedItem, item);
-
-    return {
-      id: String(item.id),
-      title: item.name,
-      description: item.description,
-      price: Math.round(item.price_cents / 100),
-      image: imageUrl
-    };
-  } catch (error) {
-    console.error(`Error processing item ${item.id}:`, error);
-    return {
-      id: String(item.id),
-      title: item.name,
-      description: item.description,
-      price: Math.round(item.price_cents / 100),
-      image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80'
-    };
-  }
-};
-
-export const fetchEnvatoItems = async (searchTerm: string = 'wordpress', page: number = 1) => {
-  console.log('Fetching Envato items with search term:', searchTerm, 'page:', page);
-  try {
-    const apiKey = await getEnvatoApiKey();
-    const response = await searchEnvatoItems(apiKey, searchTerm, page);
-    const processedItems = await Promise.all((response.matches || []).map(item => processEnvatoItem(item, apiKey)));
-    console.log('Successfully processed all items:', processedItems.length);
     return {
       items: processedItems,
-      total: response.total_items || 0,
-      hasMore: (page * 12) < (response.total_items || 0)
+      total: totalItems,
+      hasMore,
+      currentPage: page
     };
   } catch (error) {
     console.error('Error fetching Envato items:', error);
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        throw new Error('Envato APIのエンドポイントにアクセスできません。APIキーの権限を確認してください。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
-      }
-      if (error.response?.status === 403) {
-        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。');
-      }
-      if (error.response?.data) {
-        console.error('API Error response:', error.response.data);
-      }
-    }
-    throw error;
+    throw new Error('Failed to fetch items from Envato');
   }
 };
