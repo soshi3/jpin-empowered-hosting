@@ -1,9 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
-import { EnvatoItem } from '../../types/envato';
-import { getBestImageUrl } from '../../utils/image-utils';
+import { EnvatoItem, ProcessedItem } from '../../types/envato';
 import { getDetailedItemInfo } from './details';
+import { getBestImageUrl } from '../../utils/image-utils';
 
-export const processEnvatoItem = async (item: EnvatoItem, apiKey: string) => {
+export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<ProcessedItem> => {
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
