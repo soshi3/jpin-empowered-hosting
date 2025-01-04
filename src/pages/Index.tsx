@@ -10,6 +10,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { PRODUCT_CATEGORIES } from "@/lib/types/categories";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   const { toast } = useToast();
@@ -29,6 +31,30 @@ const Index = () => {
 
   console.log('Products data:', products);
   console.log('Error:', error);
+
+  // 商品をカテゴリーに分類する関数
+  const categorizeProducts = (products: any[]) => {
+    if (!products) return {};
+    
+    return products.reduce((acc: Record<string, any[]>, product) => {
+      // 商品名に基づいて簡易的にカテゴリー分類
+      let category = 'web-app'; // デフォルトカテゴリー
+      
+      if (product.title.toLowerCase().includes('landing') || 
+          product.title.toLowerCase().includes('lp')) {
+        category = 'landing-page';
+      } else if (product.title.toLowerCase().includes('admin') || 
+                 product.title.toLowerCase().includes('dashboard')) {
+        category = 'dashboard';
+      }
+      
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(product);
+      return acc;
+    }, {});
+  };
 
   return (
     <div className="min-h-screen">
@@ -76,11 +102,38 @@ const Index = () => {
               </AlertDescription>
             </Alert>
           ) : products && products.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8">
-              {products.map((product) => (
-                <ProductCard key={product.id} {...product} />
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="grid w-full max-w-2xl mx-auto mb-8 grid-cols-4">
+                <TabsTrigger value="all">すべて</TabsTrigger>
+                {PRODUCT_CATEGORIES.map((category) => (
+                  <TabsTrigger key={category.id} value={category.id}>
+                    {category.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+
+              <TabsContent value="all">
+                <div className="grid md:grid-cols-3 gap-8">
+                  {products.map((product) => (
+                    <ProductCard key={product.id} {...product} />
+                  ))}
+                </div>
+              </TabsContent>
+
+              {PRODUCT_CATEGORIES.map((category) => (
+                <TabsContent key={category.id} value={category.id}>
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {categorizeProducts(products)[category.id]?.map((product: any) => (
+                      <ProductCard key={product.id} {...product} />
+                    )) || (
+                      <p className="col-span-3 text-center text-muted-foreground py-8">
+                        このカテゴリーの商品は現在ありません。
+                      </p>
+                    )}
+                  </div>
+                </TabsContent>
               ))}
-            </div>
+            </Tabs>
           ) : (
             <div className="text-center text-muted-foreground">
               商品が見つかりませんでした。
