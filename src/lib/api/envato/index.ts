@@ -3,6 +3,7 @@ import { searchEnvatoItems } from './search';
 import { processEnvatoItem } from './process';
 import { supabase } from '@/integrations/supabase/client';
 import axios from 'axios';
+import { EnvatoItem } from '../../types/envato';
 
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items with search term:', searchTerm);
@@ -22,7 +23,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       return [];
     }
 
-    const items = searchResponse.matches;
+    const items: EnvatoItem[] = searchResponse.matches;
     console.log(`Processing ${items.length} items from search`);
     
     // Process items and handle any individual processing errors
