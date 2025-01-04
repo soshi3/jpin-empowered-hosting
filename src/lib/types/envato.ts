@@ -7,6 +7,10 @@ export interface EnvatoItem {
   preview_url: string;
   thumbnail_url: string;
   live_preview_url: string;
+  classification?: string;
+  tags?: string[];
+  number_of_sales?: number;
+  rating?: number;
 }
 
 export interface EnvatoItemPreview {
