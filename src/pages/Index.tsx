@@ -75,12 +75,12 @@ const Index = () => {
   const allProducts = data?.pages.flatMap(page => page.items) ?? [];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Section with Stripe-like gradient background */}
       <section className="relative min-h-[600px] w-full overflow-hidden">
-        <div className="hero-gradient absolute inset-0"></div>
+        <div className="hero-gradient"></div>
         <div className="mesh-gradient"></div>
         <div className="container relative z-10 mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
