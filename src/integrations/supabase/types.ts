@@ -132,29 +132,47 @@ export type Database = {
       }
       products: {
         Row: {
+          author: string | null
+          category: string | null
           created_at: string
           description: string
+          envato_id: number | null
           id: string
           image: string
           price: number
+          rating: number | null
+          sales: number | null
+          tags: string[] | null
           title: string
           updated_at: string
         }
         Insert: {
+          author?: string | null
+          category?: string | null
           created_at?: string
           description: string
+          envato_id?: number | null
           id: string
           image: string
           price: number
+          rating?: number | null
+          sales?: number | null
+          tags?: string[] | null
           title: string
           updated_at?: string
         }
         Update: {
+          author?: string | null
+          category?: string | null
           created_at?: string
           description?: string
+          envato_id?: number | null
           id?: string
           image?: string
           price?: number
+          rating?: number | null
+          sales?: number | null
+          tags?: string[] | null
           title?: string
           updated_at?: string
         }
