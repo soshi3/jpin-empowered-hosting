@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { ProductImage } from "@/components/ProductImage";
 import { ProductOptions } from "@/components/ProductOptions";
@@ -9,6 +9,7 @@ import { ProductHeader } from "@/components/ProductHeader";
 import { ProductReviews } from "@/components/ProductReviews";
 import { SimilarProducts } from "@/components/SimilarProducts";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -44,12 +45,12 @@ const ProductDetail = () => {
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-red-600">
-              エラーが発生しました
+              An error occurred
             </h2>
             <p className="mt-2 text-gray-600">
-              商品情報の取得に失敗しました。
+              Failed to fetch product details.
               <br />
-              しばらく経ってからもう一度お試しください。
+              Please try again later.
             </p>
           </div>
         </div>
@@ -65,29 +66,29 @@ const ProductDetail = () => {
           <div className="space-y-8">
             <ProductImage product={products} />
             <div className="p-6 bg-muted rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">商品情報</h3>
+              <h3 className="text-lg font-semibold mb-4">Product Information</h3>
               <dl className="space-y-4">
                 {products?.author && (
                   <div>
-                    <dt className="text-sm font-medium text-muted-foreground">作者</dt>
+                    <dt className="text-sm font-medium text-muted-foreground">Author</dt>
                     <dd className="text-base">{products.author}</dd>
                   </div>
                 )}
                 {products?.sales !== undefined && (
                   <div>
-                    <dt className="text-sm font-medium text-muted-foreground">販売数</dt>
-                    <dd className="text-base">{products.sales.toLocaleString()}件</dd>
+                    <dt className="text-sm font-medium text-muted-foreground">Total Sales</dt>
+                    <dd className="text-base">{products.sales.toLocaleString()} sales</dd>
                   </div>
                 )}
                 {products?.category && (
                   <div>
-                    <dt className="text-sm font-medium text-muted-foreground">カテゴリー</dt>
+                    <dt className="text-sm font-medium text-muted-foreground">Category</dt>
                     <dd className="text-base">{products.category}</dd>
                   </div>
                 )}
                 {products?.tags && products.tags.length > 0 && (
                   <div>
-                    <dt className="text-sm font-medium text-muted-foreground">タグ</dt>
+                    <dt className="text-sm font-medium text-muted-foreground">Tags</dt>
                     <dd className="flex flex-wrap gap-2 mt-1">
                       {products.tags.map((tag, index) => (
                         <span
@@ -102,6 +103,34 @@ const ProductDetail = () => {
                 )}
               </dl>
             </div>
+
+            {(products?.demo_url || products?.live_preview_url) && (
+              <div className="p-6 bg-muted rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Demo & Preview</h3>
+                <div className="space-y-3">
+                  {products.demo_url && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => window.open(products.demo_url, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      View Demo
+                    </Button>
+                  )}
+                  {products.live_preview_url && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => window.open(products.live_preview_url, '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Live Preview
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-8">
             <ProductHeader product={products} />

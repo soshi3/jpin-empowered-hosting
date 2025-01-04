@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Package } from "lucide-react";
+import { Package, Star } from "lucide-react";
 import { ProcessedItem } from "@/lib/types/envato";
 
 interface ProductHeaderProps {
@@ -15,8 +15,14 @@ export const ProductHeader = ({ product }: ProductHeaderProps) => {
         </h1>
         <Badge variant="secondary">
           <Package className="w-4 h-4 mr-2" />
-          商品
+          Product
         </Badge>
+        {product?.rating && (
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-700 hover:bg-yellow-100">
+            <Star className="w-4 h-4 mr-2 fill-yellow-400 text-yellow-400" />
+            {product.rating.toFixed(1)}
+          </Badge>
+        )}
       </div>
       
       <p className="text-xl text-gray-600 mb-8 whitespace-pre-line">

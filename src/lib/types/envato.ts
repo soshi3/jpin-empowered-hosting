@@ -41,4 +41,10 @@ export interface ProcessedItem {
   image: string;
   additional_images?: string[];
   category?: string | null;
+  tags?: string[];
+  author?: string;
+  sales?: number;
+  rating?: number;
+  demo_url?: string;
+  live_preview_url?: string;
 }
