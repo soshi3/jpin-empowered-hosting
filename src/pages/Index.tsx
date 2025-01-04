@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useMemo } from "react";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchInput } from "@/components/SearchInput";
+import { categorizeProducts } from "@/utils/categoryUtils";
 
 const Index = () => {
   const { toast } = useToast();
@@ -25,8 +26,8 @@ const Index = () => {
       console.log('Fetching Envato products...');
       return fetchEnvatoItems();
     },
-    staleTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ
-    gcTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ保持
+    staleTime: 4 * 60 * 60 * 1000,
+    gcTime: 4 * 60 * 60 * 1000,
     retry: 3,
     retryDelay: 1000,
     throwOnError: true,
@@ -41,65 +42,6 @@ const Index = () => {
       }
     }
   });
-
-  console.log('Products data:', products);
-  console.log('Error:', error);
-  console.log('Search query:', searchQuery);
-  console.log('Active category:', activeCategory);
-
-  // 商品をカテゴリーに分類する関数
-  const categorizeProducts = (products: any[]) => {
-    if (!products) return {};
-    
-    return products.reduce((acc: Record<string, any[]>, product) => {
-      // タイトルとdescriptionに基づいて詳細なカテゴリー分類
-      let categories = ['web-app']; // デフォルトカテゴリーを配列として保持
-      const titleLower = product.title.toLowerCase();
-      const descLower = product.description.toLowerCase();
-      
-      // 複数のカテゴリーに属する可能性を考慮
-      if (titleLower.includes('landing') || titleLower.includes('lp') || 
-          descLower.includes('landing') || descLower.includes('lp')) {
-        categories.push('landing-page');
-      }
-      if (titleLower.includes('admin') || titleLower.includes('dashboard') || 
-          descLower.includes('admin') || descLower.includes('dashboard')) {
-        categories.push('dashboard');
-      }
-      if (titleLower.includes('shop') || titleLower.includes('ecommerce') || 
-          titleLower.includes('store') || descLower.includes('shop') || 
-          descLower.includes('ecommerce') || descLower.includes('store')) {
-        categories.push('ecommerce');
-      }
-      if (titleLower.includes('community') || titleLower.includes('social') || 
-          titleLower.includes('forum') || descLower.includes('community') || 
-          descLower.includes('social') || descLower.includes('forum')) {
-        categories.push('community');
-      }
-      if (titleLower.includes('business') || titleLower.includes('corporate') || 
-          descLower.includes('business') || descLower.includes('corporate')) {
-        categories.push('business');
-      }
-      if (titleLower.includes('developer') || titleLower.includes('api') || 
-          descLower.includes('developer') || descLower.includes('api')) {
-        categories.push('developer');
-      }
-      if (titleLower.includes('design') || titleLower.includes('ui kit') || 
-          descLower.includes('design') || descLower.includes('ui kit')) {
-        categories.push('design');
-      }
-
-      // 各カテゴリーに商品を追加
-      categories.forEach(category => {
-        if (!acc[category]) {
-          acc[category] = [];
-        }
-        acc[category].push(product);
-      });
-      
-      return acc;
-    }, {});
-  };
 
   // 検索とカテゴリーフィルタリングを組み合わせた商品リストを生成
   const filteredProducts = useMemo(() => {
@@ -177,7 +119,7 @@ const Index = () => {
 
               <div className="grid md:grid-cols-3 gap-8">
                 {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product: any) => (
+                  filteredProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))
                 ) : (
