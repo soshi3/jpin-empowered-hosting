@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { supabase } from '@/integrations/supabase/client';
 
-const ENVATO_API_URL = 'https://api.envato.com/v3/market';
-
 interface EnvatoItem {
   id: number;
   name: string;
@@ -40,7 +38,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     });
 
     console.log('Making request to Envato API...');
-    const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
+    const response = await axios.get<EnvatoResponse>('https://api.envato.com/v3/market/catalog/items', {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Accept': 'application/json',
