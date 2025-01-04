@@ -24,6 +24,7 @@ interface ProductCardProps {
 export const ProductCard = ({ id, title, description, price, image, additional_images = [] }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showCarousel, setShowCarousel] = useState(false);
 
   // Filter out null/undefined values and ensure string type
   const allImages = [image, ...(additional_images || [])].filter((img): img is string => 
@@ -91,35 +92,64 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
-        <Link to={`/product/${id}`} className="relative aspect-video w-full bg-gray-100 block">
+        <Link 
+          to={`/product/${id}`} 
+          className="relative aspect-video w-full bg-gray-100 block"
+          onMouseEnter={() => setShowCarousel(true)}
+          onMouseLeave={() => setShowCarousel(false)}
+        >
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           )}
           {hasMultipleImages ? (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {allImages.map((img, index) => (
-                  <CarouselItem key={index}>
-                    <img
-                      src={imageError ? getFallbackImage() : img}
-                      alt={`${title} - Image ${index + 1}`}
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-                        isLoading ? 'opacity-0' : 'opacity-100'
-                      }`}
-                      onError={() => {
-                        console.error(`Error loading image ${index + 1} for product ${id}`);
-                        setImageError(true);
-                      }}
-                      loading="lazy"
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
+            <div className="relative w-full h-full">
+              {!showCarousel ? (
+                <img
+                  src={currentImage}
+                  alt={title}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                    isLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  onError={() => {
+                    console.error(`Error loading main image for product ${id}`);
+                    setImageError(true);
+                  }}
+                  loading="lazy"
+                />
+              ) : (
+                <Carousel className="w-full h-full">
+                  <CarouselContent>
+                    {allImages.map((img, index) => (
+                      <CarouselItem key={index}>
+                        <img
+                          src={imageError ? getFallbackImage() : img}
+                          alt={`${title} - Image ${index + 1}`}
+                          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                            isLoading ? 'opacity-0' : 'opacity-100'
+                          }`}
+                          onError={() => {
+                            console.error(`Error loading image ${index + 1} for product ${id}`);
+                            setImageError(true);
+                          }}
+                          loading="lazy"
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="hidden md:flex" />
+                  <CarouselNext className="hidden md:flex" />
+                </Carousel>
+              )}
+              {hasMultipleImages && !showCarousel && (
+                <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                  <Badge variant="secondary" className="bg-white/80 hover:bg-white/90">
+                    {allImages.length} 枚の画像
+                  </Badge>
+                </div>
+              )}
+            </div>
           ) : (
             <img
               src={currentImage}
