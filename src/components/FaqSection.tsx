@@ -26,9 +26,9 @@ export const FaqSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-background dark:bg-[#1A1F2C]">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">よくある質問</h2>
+        <h2 className="text-3xl font-bold text-center mb-12 text-foreground">よくある質問</h2>
         <div className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible>
             {faqs.map((faq, index) => (
