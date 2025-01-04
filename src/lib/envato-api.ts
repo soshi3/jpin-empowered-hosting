@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { supabase } from '@/integrations/supabase/client';
 
 const ENVATO_API_URL = 'https://api.envato.com/v3/market';
 
@@ -17,14 +18,19 @@ interface EnvatoResponse {
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items...');
   try {
-    const apiKey = import.meta.env.VITE_ENVATO_API_KEY;
-    if (!apiKey) {
-      throw new Error('Envato APIキーが設定されていません。');
+    const { data: { ENVATO_API_KEY }, error } = await supabase
+      .from('secrets')
+      .select('ENVATO_API_KEY')
+      .single();
+
+    if (error || !ENVATO_API_KEY) {
+      console.error('Error fetching Envato API key:', error);
+      throw new Error('Envato APIキーの取得に失敗しました。');
     }
 
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${ENVATO_API_KEY}`,
       },
       params: {
         term: searchTerm,

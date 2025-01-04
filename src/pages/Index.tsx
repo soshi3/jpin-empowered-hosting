@@ -9,14 +9,25 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const { toast } = useToast();
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => fetchEnvatoItems(),
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "エラー",
+        description: error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。",
+      });
+    }
   });
 
   console.log('Products data:', products);
+  console.log('Error:', error);
 
   return (
     <div className="min-h-screen">
@@ -63,9 +74,11 @@ const Index = () => {
               ))}
             </div>
           ) : error ? (
-            <div className="text-center text-red-500">
-              商品の読み込み中にエラーが発生しました。
-            </div>
+            <Alert variant="destructive" className="max-w-lg mx-auto">
+              <AlertDescription>
+                {error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。"}
+              </AlertDescription>
+            </Alert>
           ) : (
             <div className="grid md:grid-cols-3 gap-8">
               {products?.map((product) => (
@@ -77,7 +90,6 @@ const Index = () => {
       </section>
 
       <PricingSection />
-
       <FaqSection />
 
       {/* Contact Section */}
