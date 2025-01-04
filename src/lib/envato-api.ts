@@ -39,15 +39,23 @@ export const fetchEnvatoItems = async (
   console.log(`Fetching Envato items for query: ${searchQuery}, page: ${page}`);
   
   try {
-    const response = await axios.get<{ data: string }>('/api/get-envato-items', {
+    const response = await axios.get<EnvatoResponse>('/api/get-envato-items', {
       params: {
         search_query: searchQuery,
         page
       }
     });
 
-    const envatoData: EnvatoResponse = JSON.parse(response.data.data);
-    console.log('Envato API Response:', envatoData);
+    // Log the raw response for debugging
+    console.log('Raw Envato API Response:', response.data);
+
+    if (!response.data || !response.data.matches) {
+      console.error('Invalid response format from Envato API:', response.data);
+      throw new Error('Invalid response format from Envato API');
+    }
+
+    const envatoData = response.data;
+    console.log('Processed Envato API Response:', envatoData);
 
     const processedItems: ProcessedItem[] = envatoData.matches.map(item => ({
       id: item.id.toString(),
@@ -60,7 +68,7 @@ export const fetchEnvatoItems = async (
       previewUrl: item.preview_url,
       tags: item.wordpress_theme_metadata?.tags || [],
       category: item.classification,
-      image: item.preview_url // Adding the image property using preview_url
+      image: item.preview_url
     }));
 
     const totalItems = envatoData.total_items;
