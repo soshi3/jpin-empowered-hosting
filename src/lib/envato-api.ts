@@ -31,10 +31,18 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       throw new Error('Envato APIキーが設定されていません。');
     }
 
+    // Log API key format (first and last 4 chars) for debugging
+    const apiKey = secretData.ENVATO_API_KEY;
+    console.log('API Key format check:', {
+      firstFourChars: apiKey.substring(0, 4),
+      lastFourChars: apiKey.substring(apiKey.length - 4),
+      length: apiKey.length
+    });
+
     console.log('Making request to Envato API...');
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
-        'Authorization': `Bearer ${secretData.ENVATO_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
@@ -66,9 +74,13 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   } catch (error) {
     console.error('Error fetching Envato items:', error);
     if (axios.isAxiosError(error)) {
+      if (error.response?.status === 404) {
+        console.error('Received 404 error from Envato API:', error.response.data);
+        throw new Error('Envato APIのエンドポイントにアクセスできません。APIキーの権限を確認してください。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
+      }
       if (error.response?.status === 403) {
         console.error('Received 403 error from Envato API:', error.response.data);
-        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
+        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。');
       }
       if (error.response?.data) {
         console.error('API Error response:', error.response.data);
