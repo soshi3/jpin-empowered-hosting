@@ -104,7 +104,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-white hover:bg-white/10 shadow-lg backdrop-blur-sm"
+                className="border-white text-black hover:bg-white/10 shadow-lg backdrop-blur-sm"
               >
                 お問い合わせ
               </Button>
