@@ -56,6 +56,7 @@ const Index = () => {
       const timeInMs = endTime - startTime;
       setLoadTime(timeInMs);
       console.log(`Products loaded in ${timeInMs.toFixed(2)}ms`);
+      console.log('Total products loaded:', products.length);
     }
   }, [products, isLoading, startTime]);
 
@@ -63,17 +64,18 @@ const Index = () => {
     console.log('Performing search with query:', query);
     setSearchQuery(query);
     setPage(1);
-    toast({
-      title: "Search Executed",
-      description: `Searching for "${query}"...`,
-    });
   };
 
   const filteredProducts = useMemo(() => {
-    if (!products) return [];
+    if (!products || products.length === 0) {
+      console.log('No products available for filtering');
+      return [];
+    }
     
+    console.log('Filtering products...');
     console.log('Total products before filtering:', products.length);
     console.log('Current search query:', searchQuery);
+    console.log('Current category:', activeCategory);
     
     let filtered = products;
     
@@ -86,31 +88,36 @@ const Index = () => {
       });
       
       console.log('Products after search filtering:', filtered.length);
-      
-      if (filtered.length === 0) {
-        toast({
-          title: "Search Results",
-          description: "No products found matching your search.",
-          variant: "destructive",
-        });
-      }
     }
 
     if (activeCategory !== "all") {
       const categorized = categorizeProducts(filtered);
       console.log(`Products in ${activeCategory} category:`, categorized[activeCategory]?.length || 0);
-      return categorized[activeCategory] || [];
+      filtered = categorized[activeCategory] || [];
     }
     
+    console.log('Final filtered products count:', filtered.length);
     return filtered;
   }, [products, searchQuery, activeCategory]);
 
   const paginatedProducts = useMemo(() => {
+    if (!filteredProducts.length) {
+      console.log('No products to paginate');
+      return [];
+    }
+    
     const startIndex = (page - 1) * ITEMS_PER_PAGE;
-    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    const paginatedItems = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    console.log(`Paginated products: showing ${paginatedItems.length} items from index ${startIndex}`);
+    return paginatedItems;
   }, [filteredProducts, page]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
+  // Reset page when category or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [activeCategory, searchQuery]);
 
   return (
     <div className="min-h-screen">
@@ -162,66 +169,82 @@ const Index = () => {
               </div>
             )}
           </div>
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center space-y-4">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">Loading products...</p>
-            </div>
-          ) : error ? (
-            <Alert variant="destructive" className="max-w-lg mx-auto">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="ml-2">
-                {error instanceof Error ? error.message : "An error occurred while loading products."}
-              </AlertDescription>
-            </Alert>
-          ) : products && products.length > 0 ? (
-            <div className="space-y-8">
-              <SearchInput 
-                value={searchQuery} 
-                onChange={setSearchQuery}
-                onSearch={handleSearch}
-              />
-              <CategoryFilter onCategoryChange={setActiveCategory} />
 
-              <div className="grid md:grid-cols-3 gap-8">
-                {paginatedProducts.length > 0 ? (
-                  paginatedProducts.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                  ))
-                ) : (
-                  <p className="col-span-3 text-center text-muted-foreground py-8">
-                    {searchQuery ? "No products found matching your search criteria." : "Loading products..."}
-                  </p>
-                )}
+          <div className="space-y-8">
+            <SearchInput 
+              value={searchQuery} 
+              onChange={setSearchQuery}
+              onSearch={handleSearch}
+            />
+            <CategoryFilter onCategoryChange={setActiveCategory} />
+
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center space-y-4">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-muted-foreground">Loading products...</p>
               </div>
+            ) : error ? (
+              <Alert variant="destructive" className="max-w-lg mx-auto">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="ml-2">
+                  {error instanceof Error ? error.message : "An error occurred while loading products."}
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <>
+                {filteredProducts.length > 0 ? (
+                  <>
+                    <div className="grid md:grid-cols-3 gap-8">
+                      {paginatedProducts.map((product) => (
+                        <ProductCard key={product.id} {...product} />
+                      ))}
+                    </div>
 
-              {totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="flex items-center px-4">
-                    Page {page} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                  >
-                    Next
-                  </Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center text-muted-foreground">
-              No products found.
-            </div>
-          )}
+                    {totalPages > 1 && (
+                      <div className="flex justify-center gap-2 mt-8">
+                        <Button
+                          variant="outline"
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                        >
+                          Previous
+                        </Button>
+                        <span className="flex items-center px-4">
+                          Page {page} of {totalPages}
+                        </span>
+                        <Button
+                          variant="outline"
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-lg text-muted-foreground mb-4">
+                      {searchQuery 
+                        ? `「${searchQuery}」に一致する商品が見つかりませんでした。` 
+                        : activeCategory !== 'all'
+                          ? `${activeCategory}カテゴリーの商品が見つかりませんでした。`
+                          : "商品が見つかりませんでした。"}
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSearchQuery('');
+                        setActiveCategory('all');
+                      }}
+                    >
+                      すべての商品を表示
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </section>
 
