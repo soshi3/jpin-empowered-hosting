@@ -17,22 +17,23 @@ interface ProductCardProps {
   title: string;
   description: string;
   price: number;
-  image: string;
-  additional_images?: string[];
+  image: string | null;
+  additional_images?: string[] | null;
 }
 
 export const ProductCard = ({ id, title, description, price, image, additional_images = [] }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const allImages = [image, ...(additional_images || [])];
+  const allImages = [image, ...(additional_images || [])].filter(Boolean) as string[];
   const hasMultipleImages = allImages.length > 1;
 
   useEffect(() => {
+    console.log(`Loading images for product ${id}:`, { image, additional_images });
     setImageError(false);
     setIsLoading(true);
 
     if (!image) {
-      console.log(`No image URL provided for product ${id}`);
+      console.log(`No image URL provided for product ${id}, using fallback`);
       setImageError(true);
       setIsLoading(false);
       return;
@@ -44,8 +45,14 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
           allImages.map((imageUrl) => {
             return new Promise((resolve, reject) => {
               const img = new Image();
-              img.onload = resolve;
-              img.onerror = reject;
+              img.onload = () => {
+                console.log(`Successfully loaded image: ${imageUrl}`);
+                resolve(null);
+              };
+              img.onerror = (error) => {
+                console.error(`Failed to load image: ${imageUrl}`, error);
+                reject(error);
+              };
               img.src = imageUrl;
             });
           })
@@ -73,6 +80,8 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
     return fallbackImages[index];
   };
 
+  const currentImage = imageError ? getFallbackImage() : image;
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
@@ -93,7 +102,10 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
                       className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                         isLoading ? 'opacity-0' : 'opacity-100'
                       }`}
-                      onError={() => setImageError(true)}
+                      onError={() => {
+                        console.error(`Error loading image ${index + 1} for product ${id}`);
+                        setImageError(true);
+                      }}
                       loading="lazy"
                     />
                   </CarouselItem>
@@ -104,12 +116,15 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
             </Carousel>
           ) : (
             <img
-              src={imageError ? getFallbackImage() : image}
+              src={currentImage}
               alt={title}
               className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                 isLoading ? 'opacity-0' : 'opacity-100'
               }`}
-              onError={() => setImageError(true)}
+              onError={() => {
+                console.error(`Error loading main image for product ${id}`);
+                setImageError(true);
+              }}
               loading="lazy"
             />
           )}
