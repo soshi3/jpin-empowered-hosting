@@ -84,35 +84,26 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     // Try to get preview image from different possible locations in the API response
     let imageUrl = null;
 
-    // First try the main preview URL from v3 API
-    if (itemResponse.data.previews && itemResponse.data.previews.landscape_preview) {
-      imageUrl = itemResponse.data.previews.landscape_preview.landscape_url;
-      console.log(`Found landscape preview URL for item ${item.id}:`, imageUrl);
-    }
-    // Then try the preview images array
-    else if (Array.isArray(itemResponse.data.preview_images) && itemResponse.data.preview_images.length > 0) {
-      imageUrl = itemResponse.data.preview_images[0].landscape_url;
-      console.log(`Found preview image URL for item ${item.id}:`, imageUrl);
-    }
-    // Then try the preview URL directly
-    else if (itemResponse.data.preview_url) {
-      imageUrl = itemResponse.data.preview_url;
-      console.log(`Found preview_url for item ${item.id}:`, imageUrl);
-    }
-    // Then try live preview URL
-    else if (itemResponse.data.live_preview_url) {
-      imageUrl = itemResponse.data.live_preview_url;
-      console.log(`Found live_preview_url for item ${item.id}:`, imageUrl);
-    }
-    // Finally, fall back to the search response URLs
-    if (!imageUrl) {
-      imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
-      if (imageUrl) {
-        console.log(`Using fallback URL from search response for item ${item.id}:`, imageUrl);
-      } else {
-        console.log(`No image URL found for item ${item.id}, using default fallback`);
-        imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
-      }
+    // Try all possible image URL locations in order of preference
+    const possibleImageUrls = [
+      itemResponse.data.previews?.landscape_preview?.landscape_url,
+      itemResponse.data.previews?.icon_with_landscape_preview?.landscape_url,
+      itemResponse.data.preview_images?.[0]?.landscape_url,
+      itemResponse.data.preview_url,
+      itemResponse.data.live_preview_url,
+      item.live_preview_url,
+      item.preview_url,
+      item.thumbnail_url
+    ];
+
+    // Find the first valid URL
+    imageUrl = possibleImageUrls.find(url => url && typeof url === 'string');
+
+    if (imageUrl) {
+      console.log(`Found image URL for item ${item.id}:`, imageUrl);
+    } else {
+      console.log(`No image URL found for item ${item.id}, using default fallback`);
+      imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
     }
 
     return {
