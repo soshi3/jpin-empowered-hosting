@@ -28,8 +28,8 @@ const getEnvatoApiKey = async (): Promise<string> => {
 const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<EnvatoItem[]> => {
   console.log('Making request to Envato API with search term:', searchTerm);
   const allItems: EnvatoItem[] = [];
-  const pageSize = 30; // 1ページあたりの商品数
-  const maxPages = 3; // 3ページ（90件）まで取得するように変更
+  const pageSize = 30;
+  const maxPages = 3;
 
   try {
     for (let page = 1; page <= maxPages; page++) {
@@ -44,7 +44,7 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
           site: 'codecanyon.net',
           page: page,
           page_size: pageSize,
-          sort_by: 'sales'  // 売上順でソート
+          sort_by: 'sales'
         }
       });
 
@@ -57,7 +57,6 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
       allItems.push(...items);
       console.log(`Retrieved ${items.length} items from page ${page}. Total items so far: ${allItems.length}`);
 
-      // APIレート制限に配慮して少し待機（1秒）
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
@@ -94,47 +93,48 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
     const imageUrl = getBestImageUrl(detailedItem, item);
 
-    // 商品情報をSupabaseに保存または更新
-    const { data: existingProduct, error: fetchError } = await supabase
+    // Check for existing product using maybeSingle() instead of single()
+    const { data: existingProduct } = await supabase
       .from('products')
       .select('sales')
       .eq('id', String(item.id))
-      .single();
+      .maybeSingle();
 
-    if (!fetchError && existingProduct) {
-      // 既存の商品情報を更新
+    const productData = {
+      id: String(item.id),
+      title: item.name,
+      description: item.description,
+      price: Math.round(item.price_cents / 100),
+      image: imageUrl,
+      sales: (existingProduct?.sales || 0) + 1,
+      updated_at: new Date().toISOString()
+    };
+
+    if (existingProduct) {
+      // Update existing product
       const { error: updateError } = await supabase
         .from('products')
-        .update({
-          title: item.name,
-          description: item.description,
-          price: Math.round(item.price_cents / 100),
-          image: imageUrl,
-          sales: (existingProduct.sales || 0) + 1, // 売上数を増やす
-          updated_at: new Date().toISOString()
-        })
+        .update(productData)
         .eq('id', String(item.id));
 
       if (updateError) {
         console.error(`Error updating product ${item.id}:`, updateError);
+      } else {
+        console.log(`Successfully updated product ${item.id}`);
       }
     } else {
-      // 新規商品を追加
+      // Insert new product
       const { error: insertError } = await supabase
         .from('products')
         .insert({
-          id: String(item.id),
-          title: item.name,
-          description: item.description,
-          price: Math.round(item.price_cents / 100),
-          image: imageUrl,
-          sales: 1, // 初期売上数を1に設定
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          ...productData,
+          created_at: new Date().toISOString()
         });
 
       if (insertError) {
         console.error(`Error inserting product ${item.id}:`, insertError);
+      } else {
+        console.log(`Successfully inserted product ${item.id}`);
       }
     }
 
@@ -163,12 +163,10 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     const apiKey = await getEnvatoApiKey();
     const items = await searchEnvatoItems(apiKey, searchTerm);
     
-    // 並列処理で詳細情報を取得（バッチ処理で最適化）
     const processedItems = await Promise.all(
       items.map(item => processEnvatoItem(item, apiKey))
     );
     
-    // 売上数でソート
     const { data: sortedProducts, error } = await supabase
       .from('products')
       .select('*')
@@ -179,7 +177,6 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       return processedItems;
     }
 
-    // Supabaseから取得したソート済みの商品リストを返す
     console.log('Successfully retrieved sorted products:', sortedProducts?.length);
     return sortedProducts || processedItems;
   } catch (error) {
