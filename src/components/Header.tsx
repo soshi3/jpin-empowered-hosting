@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Globe, Moon, Sun, Server } from "lucide-react";
+import { Globe, Moon, Sun, ServerCog } from "lucide-react";
 
 export const Header = () => {
   const { language, setLanguage, t } = useLanguage();
@@ -16,7 +16,7 @@ export const Header = () => {
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative overflow-hidden">
       <div className="absolute inset-0 opacity-10 pointer-events-none">
         {[...Array(6)].map((_, i) => (
-          <Server
+          <ServerCog
             key={i}
             className="absolute text-primary"
             style={{
