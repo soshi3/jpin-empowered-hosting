@@ -22,11 +22,13 @@ const ProductDetail = () => {
         throw new Error("Product not found");
       }
       console.log('Found product:', product);
+      const imageUrl = product.image ? 
+        (typeof product.image === 'object' ? product.image.value : product.image) 
+        : null;
+      console.log('Processed image URL:', imageUrl);
       return {
         ...product,
-        image: product.image ? 
-          (typeof product.image === 'object' ? product.image.value : product.image) 
-          : null
+        image: imageUrl
       };
     },
   });
@@ -52,6 +54,10 @@ const ProductDetail = () => {
         img.onload = null;
         img.onerror = null;
       };
+    } else {
+      // If there's no image, set loading to false and error to true
+      setImageLoading(false);
+      setImageError(true);
     }
   }, [products?.image]);
 
@@ -101,7 +107,7 @@ const ProductDetail = () => {
             )}
             <img
               src={imageError || !product?.image ? fallbackImage : product.image}
-              alt={product?.title}
+              alt={product?.title || '商品画像'}
               className={`w-full rounded-lg shadow-lg transition-opacity duration-300 ${
                 imageLoading ? 'opacity-0' : 'opacity-100'
               }`}
