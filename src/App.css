@@ -58,10 +58,10 @@
     #ff3366
   );
   background-size: 400% 400%;
-  opacity: 0.85;
+  opacity: 0.65;
   animation: stripeGradient 15s ease infinite;
   z-index: 0;
-  mix-blend-mode: soft-light;
+  mix-blend-mode: color;
 }
 
 .stripe-gradient::before {
