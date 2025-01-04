@@ -33,22 +33,16 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
 .hero-gradient {
   background: linear-gradient(
     to bottom right,
-    rgba(37, 99, 235, 0.2),
-    rgba(16, 185, 129, 0.2)
+    rgba(37, 99, 235, 0.3),
+    rgba(16, 185, 129, 0.3)
   );
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
+  z-index: 0;
 }
 
 .hero-gradient::before,
@@ -58,19 +52,19 @@
   inset: -50%;
   background: radial-gradient(
     circle at center,
-    rgba(37, 99, 235, 0.3) 0%,
-    rgba(16, 185, 129, 0.15) 50%,
+    rgba(37, 99, 235, 0.4) 0%,
+    rgba(16, 185, 129, 0.2) 50%,
     transparent 70%
   );
-  opacity: 0.9;
+  opacity: 0.8;
   animation: pulse 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .hero-gradient::after {
   background: radial-gradient(
     circle at center,
-    rgba(16, 185, 129, 0.3) 0%,
-    rgba(37, 99, 235, 0.15) 50%,
+    rgba(16, 185, 129, 0.4) 0%,
+    rgba(37, 99, 235, 0.2) 50%,
     transparent 70%
   );
   animation: pulse 16s cubic-bezier(0.4, 0, 0.6, 1) infinite reverse;
@@ -81,10 +75,10 @@
     transform: translate(0%, 0%) rotate(0deg) scale(1);
   }
   33% {
-    transform: translate(-15%, 15%) rotate(120deg) scale(1.1);
+    transform: translate(-25%, 25%) rotate(120deg) scale(1.2);
   }
   66% {
-    transform: translate(15%, -15%) rotate(240deg) scale(0.9);
+    transform: translate(25%, -25%) rotate(240deg) scale(0.8);
   }
   100% {
     transform: translate(0%, 0%) rotate(360deg) scale(1);
@@ -95,10 +89,19 @@
   position: absolute;
   inset: 0;
   background: 
-    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.25) 0%, transparent 50%),
-    radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.25) 0%, transparent 50%),
-    radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.25) 0%, transparent 50%),
-    radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.25) 0%, transparent 50%);
-  filter: blur(60px);
-  z-index: -1;
+    radial-gradient(circle at 0% 0%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(16, 185, 129, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(37, 99, 235, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(16, 185, 129, 0.35) 0%, transparent 50%);
+  filter: blur(80px);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
 }

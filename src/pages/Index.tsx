@@ -79,9 +79,10 @@ const Index = () => {
       <Header />
       
       {/* Hero Section with Stripe-like gradient background */}
-      <section className="hero-gradient relative py-24 overflow-hidden">
+      <section className="relative min-h-[600px] w-full overflow-hidden">
+        <div className="hero-gradient absolute inset-0"></div>
         <div className="mesh-gradient"></div>
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container relative z-10 mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
               プロフェッショナルな<br />ホスティングソリューション
