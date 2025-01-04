@@ -34,13 +34,13 @@
 }
 
 .hero-gradient {
+  position: absolute;
+  inset: 0;
   background: linear-gradient(
     to bottom right,
     rgba(37, 99, 235, 0.3),
     rgba(16, 185, 129, 0.3)
   );
-  position: absolute;
-  inset: 0;
   overflow: hidden;
   z-index: 1;
 }
