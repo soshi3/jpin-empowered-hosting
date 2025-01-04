@@ -22,7 +22,7 @@ export const searchEnvatoItems = async (
   const client = createEnvatoSearchClient(token);
   
   try {
-    console.log('Searching Envato items with query:', query);
+    console.log('Making Envato API request with query:', query);
     const response = await client.get('', {
       params: {
         term: query,
@@ -33,16 +33,24 @@ export const searchEnvatoItems = async (
       }
     });
     
-    // Validate response structure
-    if (!response.data || !response.data.matches) {
-      console.warn('Invalid response structure from Envato API:', response.data);
+    console.log('Raw API response:', response.data);
+    
+    // Ensure response has the expected structure
+    if (!response.data || typeof response.data !== 'object') {
+      console.warn('Invalid response format from Envato API:', response.data);
+      return { matches: [] };
+    }
+
+    // Ensure matches is an array
+    if (!Array.isArray(response.data.matches)) {
+      console.warn('Response matches is not an array:', response.data.matches);
       return { matches: [] };
     }
     
-    console.log('Search response:', response.data);
+    console.log(`Found ${response.data.matches.length} matches in search response`);
     return response.data;
   } catch (error) {
     console.error('Error searching Envato items:', error);
-    throw error;
+    return { matches: [] };
   }
 };
