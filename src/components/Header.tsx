@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Globe } from "lucide-react";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Globe, Moon, Sun } from "lucide-react";
 
 export const Header = () => {
   const { language, setLanguage, t } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
 
   const toggleLanguage = () => {
     setLanguage(language === 'en' ? 'ja' : 'en');
@@ -32,6 +34,13 @@ export const Header = () => {
           </Link>
         </nav>
         <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+            {isDark ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
+          </Button>
           <Button variant="ghost" size="icon" onClick={toggleLanguage}>
             <Globe className="h-5 w-5" />
             <span className="ml-2 font-bold">{language.toUpperCase()}</span>
