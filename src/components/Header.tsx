@@ -14,7 +14,7 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 relative overflow-hidden">
-      <div className="absolute inset-0 opacity-5 pointer-events-none">
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
         {[...Array(6)].map((_, i) => (
           <Server
             key={i}
@@ -23,9 +23,9 @@ export const Header = () => {
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
               transform: `rotate(${Math.random() * 360}deg)`,
-              opacity: 0.2 + Math.random() * 0.3,
+              opacity: 0.3 + Math.random() * 0.4,
             }}
-            size={24 + Math.random() * 24}
+            size={48 + Math.random() * 48}
           />
         ))}
       </div>
