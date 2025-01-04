@@ -53,30 +53,50 @@ const Index = () => {
     
     return products.reduce((acc: Record<string, any[]>, product) => {
       // タイトルとdescriptionに基づいて詳細なカテゴリー分類
-      let category = 'web-app'; // デフォルトカテゴリー
+      let categories = ['web-app']; // デフォルトカテゴリーを配列として保持
       const titleLower = product.title.toLowerCase();
       const descLower = product.description.toLowerCase();
       
-      if (titleLower.includes('landing') || titleLower.includes('lp')) {
-        category = 'landing-page';
-      } else if (titleLower.includes('admin') || titleLower.includes('dashboard')) {
-        category = 'dashboard';
-      } else if (titleLower.includes('shop') || titleLower.includes('ecommerce') || titleLower.includes('store')) {
-        category = 'ecommerce';
-      } else if (titleLower.includes('community') || titleLower.includes('social') || titleLower.includes('forum')) {
-        category = 'community';
-      } else if (titleLower.includes('business') || titleLower.includes('corporate')) {
-        category = 'business';
-      } else if (titleLower.includes('developer') || titleLower.includes('api') || descLower.includes('developer')) {
-        category = 'developer';
-      } else if (titleLower.includes('design') || titleLower.includes('ui kit') || descLower.includes('design')) {
-        category = 'design';
+      // 複数のカテゴリーに属する可能性を考慮
+      if (titleLower.includes('landing') || titleLower.includes('lp') || 
+          descLower.includes('landing') || descLower.includes('lp')) {
+        categories.push('landing-page');
       }
+      if (titleLower.includes('admin') || titleLower.includes('dashboard') || 
+          descLower.includes('admin') || descLower.includes('dashboard')) {
+        categories.push('dashboard');
+      }
+      if (titleLower.includes('shop') || titleLower.includes('ecommerce') || 
+          titleLower.includes('store') || descLower.includes('shop') || 
+          descLower.includes('ecommerce') || descLower.includes('store')) {
+        categories.push('ecommerce');
+      }
+      if (titleLower.includes('community') || titleLower.includes('social') || 
+          titleLower.includes('forum') || descLower.includes('community') || 
+          descLower.includes('social') || descLower.includes('forum')) {
+        categories.push('community');
+      }
+      if (titleLower.includes('business') || titleLower.includes('corporate') || 
+          descLower.includes('business') || descLower.includes('corporate')) {
+        categories.push('business');
+      }
+      if (titleLower.includes('developer') || titleLower.includes('api') || 
+          descLower.includes('developer') || descLower.includes('api')) {
+        categories.push('developer');
+      }
+      if (titleLower.includes('design') || titleLower.includes('ui kit') || 
+          descLower.includes('design') || descLower.includes('ui kit')) {
+        categories.push('design');
+      }
+
+      // 各カテゴリーに商品を追加
+      categories.forEach(category => {
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(product);
+      });
       
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(product);
       return acc;
     }, {});
   };
@@ -85,16 +105,23 @@ const Index = () => {
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     
+    console.log('Total products before filtering:', products.length);
+    
     const filtered = products.filter(product => 
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    console.log('Products after search filtering:', filtered.length);
 
     if (activeCategory === "all") {
       return filtered;
     }
 
     const categorized = categorizeProducts(filtered);
+    console.log('Categorized products:', categorized);
+    console.log(`Products in ${activeCategory} category:`, categorized[activeCategory]?.length || 0);
+    
     return categorized[activeCategory] || [];
   }, [products, searchQuery, activeCategory]);
 
@@ -155,7 +182,7 @@ const Index = () => {
                   ))
                 ) : (
                   <p className="col-span-3 text-center text-muted-foreground py-8">
-                    {searchQuery ? "検索条件に一致する商品が見つかりませんでした。" : "このカテゴリーの商品は現在ありません。"}
+                    {searchQuery ? "検索条件に一致する商品が見つかりませんでした。" : "商品の読み込み中..."}
                   </p>
                 )}
               </div>
