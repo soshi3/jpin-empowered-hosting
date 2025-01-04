@@ -17,7 +17,7 @@ export const Header = () => {
           <img 
             src="/lovable-uploads/86055be1-5c14-4fef-a32c-32eb9b88e5da.png" 
             alt="JPIN Solutions" 
-            className="h-8 w-auto"
+            className="h-12 w-auto"
           />
         </Link>
         <nav className="hidden md:flex space-x-6">
