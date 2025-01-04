@@ -10,17 +10,23 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/api/envato";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchInput } from "@/components/SearchInput";
 import { categorizeProducts } from "@/utils/categoryUtils";
 import { Badge } from "@/components/ui/badge";
 
+const ITEMS_PER_PAGE = 12;
+
 const Index = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const [page, setPage] = useState(1);
+  const [loadTime, setLoadTime] = useState<number | null>(null);
   
+  const startTime = useMemo(() => performance.now(), []);
+
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => {
@@ -44,9 +50,19 @@ const Index = () => {
     }
   });
 
+  useEffect(() => {
+    if (products && !isLoading) {
+      const endTime = performance.now();
+      const timeInMs = endTime - startTime;
+      setLoadTime(timeInMs);
+      console.log(`Products loaded in ${timeInMs.toFixed(2)}ms`);
+    }
+  }, [products, isLoading, startTime]);
+
   const handleSearch = (query: string) => {
     console.log('Performing search with query:', query);
     setSearchQuery(query);
+    setPage(1);
     toast({
       title: "Search Executed",
       description: `Searching for "${query}"...`,
@@ -89,6 +105,13 @@ const Index = () => {
     return filtered;
   }, [products, searchQuery, activeCategory]);
 
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredProducts, page]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -127,9 +150,16 @@ const Index = () => {
           <div className="flex items-center justify-center gap-2 mb-12">
             <h2 className="text-3xl font-bold text-center">Featured Products</h2>
             {!isLoading && products && (
-              <Badge variant="secondary" className="text-sm">
-                Total {products.length} items
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-sm">
+                  Total {products.length} items
+                </Badge>
+                {loadTime && (
+                  <Badge variant="outline" className="text-sm">
+                    Loaded in {loadTime.toFixed(0)}ms
+                  </Badge>
+                )}
+              </div>
             )}
           </div>
           {isLoading ? (
@@ -154,8 +184,8 @@ const Index = () => {
               <CategoryFilter onCategoryChange={setActiveCategory} />
 
               <div className="grid md:grid-cols-3 gap-8">
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product) => (
+                {paginatedProducts.length > 0 ? (
+                  paginatedProducts.map((product) => (
                     <ProductCard key={product.id} {...product} />
                   ))
                 ) : (
@@ -164,6 +194,28 @@ const Index = () => {
                   </p>
                 )}
               </div>
+
+              {totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="flex items-center px-4">
+                    Page {page} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center text-muted-foreground">

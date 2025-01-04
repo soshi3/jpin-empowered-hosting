@@ -7,13 +7,11 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
     const categories = new Set<string>();
     const titleLower = product.title?.toLowerCase() || '';
     const descLower = product.description?.toLowerCase() || '';
-    const tagsLower = product.tags?.map(tag => tag.toLowerCase()) || [];
     
     // Templates category
     if (
       titleLower.includes('template') ||
       descLower.includes('template') ||
-      tagsLower.includes('template') ||
       titleLower.includes('theme') ||
       descLower.includes('theme')
     ) {
@@ -27,9 +25,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       descLower.includes('application') ||
       descLower.includes('app') ||
       titleLower.includes('plugin') ||
-      titleLower.includes('module') ||
-      tagsLower.includes('application') ||
-      tagsLower.includes('plugin')
+      titleLower.includes('module')
     ) {
       categories.add('web-applications');
     }
@@ -40,9 +36,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('corporate') ||
       titleLower.includes('company') ||
       descLower.includes('business solution') ||
-      descLower.includes('business management') ||
-      tagsLower.includes('business') ||
-      tagsLower.includes('corporate')
+      descLower.includes('business management')
     ) {
       categories.add('business');
     }
@@ -55,9 +49,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('store') ||
       titleLower.includes('woocommerce') ||
       descLower.includes('ecommerce') ||
-      descLower.includes('e-commerce') ||
-      tagsLower.includes('ecommerce') ||
-      tagsLower.includes('woocommerce')
+      descLower.includes('e-commerce')
     ) {
       categories.add('ecommerce');
     }
@@ -68,9 +60,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('enterprise') ||
       titleLower.includes('company portal') ||
       descLower.includes('corporate') ||
-      descLower.includes('enterprise solution') ||
-      tagsLower.includes('corporate') ||
-      tagsLower.includes('enterprise')
+      descLower.includes('enterprise solution')
     ) {
       categories.add('corporate');
     }
@@ -81,9 +71,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('magazine') ||
       titleLower.includes('news') ||
       descLower.includes('blog') ||
-      descLower.includes('blogging') ||
-      tagsLower.includes('blog') ||
-      tagsLower.includes('magazine')
+      descLower.includes('blogging')
     ) {
       categories.add('blog');
     }
@@ -94,9 +82,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('showcase') ||
       titleLower.includes('gallery') ||
       descLower.includes('portfolio') ||
-      descLower.includes('showcase') ||
-      tagsLower.includes('portfolio') ||
-      tagsLower.includes('gallery')
+      descLower.includes('showcase')
     ) {
       categories.add('portfolio');
     }
@@ -106,9 +92,7 @@ export const categorizeProducts = (products: ProcessedItem[] | undefined) => {
       titleLower.includes('landing') ||
       titleLower.includes('landing page') ||
       titleLower.includes('one page') ||
-      descLower.includes('landing page') ||
-      tagsLower.includes('landing') ||
-      tagsLower.includes('landing page')
+      descLower.includes('landing page')
     ) {
       categories.add('landing');
     }
