@@ -81,22 +81,22 @@ const Index = () => {
       {/* Hero Section with gradient background */}
       <section className="relative min-h-[600px] w-full overflow-hidden">
         <div className="absolute inset-0">
-          <div className="hero-gradient opacity-60" />
-          <div className="mesh-gradient opacity-60" />
+          <div className="hero-gradient" />
+          <div className="mesh-gradient" />
         </div>
         <div className="relative z-20 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-lg [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-white font-medium drop-shadow-md [text-shadow:_0_1px_2px_rgb(0_0_0_/_40%)]">
+            <p className="text-xl mb-8 text-white">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
               <Button 
                 size="lg" 
                 variant="default" 
-                className="bg-white text-primary hover:bg-white/90 shadow-lg font-bold"
+                className="bg-white text-primary hover:bg-white/90"
               >
                 プランを見る
                 <ArrowRight className="ml-2" />
@@ -104,7 +104,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-2 border-white text-white hover:bg-white/20 shadow-lg backdrop-blur-sm font-bold"
+                className="border-white text-white hover:bg-white/20"
               >
                 お問い合わせ
               </Button>
