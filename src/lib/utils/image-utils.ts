@@ -6,28 +6,32 @@ export const getBestImageUrl = (
   itemData: EnvatoDetailedItem,
   searchItem: EnvatoItem
 ): string => {
-  let imageUrl: string | null = null;
-
+  console.log('Getting best image URL for item:', searchItem.id);
+  
   // Try to get preview images from the detailed response
   if (itemData.preview) {
-    imageUrl = itemData.preview.landscape_url || 
-              itemData.preview.icon_with_landscape_preview?.landscape_url ||
-              itemData.preview.icon_url;
-    
-    if (imageUrl) {
-      console.log('Found preview image from detailed response:', imageUrl);
-      return imageUrl;
+    const previewUrls = [
+      itemData.preview.landscape_url,
+      itemData.preview.icon_with_landscape_preview?.landscape_url,
+      itemData.preview.icon_url
+    ].filter(Boolean);
+
+    if (previewUrls.length > 0) {
+      console.log('Found preview image from detailed response:', previewUrls[0]);
+      return previewUrls[0];
     }
   }
 
   // Try preview URLs from the search response
-  imageUrl = searchItem.live_preview_url || 
-            searchItem.preview_url || 
-            searchItem.thumbnail_url;
+  const searchUrls = [
+    searchItem.live_preview_url,
+    searchItem.preview_url,
+    searchItem.thumbnail_url
+  ].filter(Boolean);
 
-  if (imageUrl) {
-    console.log('Found preview image from search response:', imageUrl);
-    return imageUrl;
+  if (searchUrls.length > 0) {
+    console.log('Found preview image from search response:', searchUrls[0]);
+    return searchUrls[0];
   }
 
   console.log('No preview image found, using fallback image');
