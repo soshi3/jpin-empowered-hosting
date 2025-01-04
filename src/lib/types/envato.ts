@@ -47,7 +47,7 @@ export interface ProcessedItem {
   image: string;
   additional_images: string[];
   category: string | null;
-  tags: string[] | null;
+  tags: string[];
   author: string | null;
   sales: number;
   rating: number;

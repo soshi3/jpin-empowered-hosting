@@ -1,64 +1,19 @@
 import { getEnvatoApiKey } from './key';
-import { searchAllEnvatoItems } from './search';
+import { searchEnvatoItems } from './search';
 import { processEnvatoItem } from './process';
 import { supabase } from '@/integrations/supabase/client';
-import { EnvatoItem } from '../../types/envato';
+import { ProcessedItem } from '../../types/envato';
 
-export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
+export const fetchEnvatoItems = async (searchTerm: string = 'wordpress'): Promise<ProcessedItem[]> => {
   console.log('Fetching Envato items with search term:', searchTerm);
   try {
     const apiKey = await getEnvatoApiKey();
-    console.log('Successfully retrieved API key');
-
-    const searchResponse = await searchAllEnvatoItems(apiKey, searchTerm);
-    console.log('Search response received:', {
-      hasMatches: !!searchResponse?.matches,
-      matchesLength: searchResponse?.matches?.length
-    });
-
-    // Ensure we have a valid array of matches
-    const items: EnvatoItem[] = Array.isArray(searchResponse?.matches) ? searchResponse.matches : [];
-    console.log(`Processing ${items.length} items from search`);
+    const items = await searchEnvatoItems(apiKey, searchTerm);
     
-    // Try to fetch from database if API returns no results
-    if (items.length === 0) {
-      console.log('No items from API, trying database...');
-      const { data: existingProducts, error: dbError } = await supabase
-        .from('products')
-        .select('*')
-        .order('sales', { ascending: false });
-
-      if (dbError) {
-        console.error('Error fetching from database:', dbError);
-        return [];
-      }
-
-      if (existingProducts && existingProducts.length > 0) {
-        console.log('Retrieved existing products from database:', existingProducts.length);
-        return existingProducts;
-      }
-
-      console.warn('No products found in either API or database');
-      return [];
-    }
-    
-    // Process items and handle any individual processing errors
     const processedItems = await Promise.all(
-      items.map(async (item) => {
-        try {
-          return await processEnvatoItem(item, apiKey);
-        } catch (error) {
-          console.error(`Error processing item ${item.id}:`, error);
-          return null;
-        }
-      })
+      items.map(item => processEnvatoItem(item, apiKey))
     );
-
-    // Filter out any null results from failed processing
-    const validProcessedItems = processedItems.filter(item => item !== null);
-    console.log(`Successfully processed ${validProcessedItems.length} items`);
     
-    // Fetch sorted products from Supabase
     const { data: sortedProducts, error } = await supabase
       .from('products')
       .select('*')
@@ -66,11 +21,11 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
 
     if (error) {
       console.error('Error fetching sorted products:', error);
-      return validProcessedItems;
+      return processedItems;
     }
 
     console.log('Successfully retrieved sorted products:', sortedProducts?.length);
-    return sortedProducts || validProcessedItems;
+    return sortedProducts as ProcessedItem[] || processedItems;
   } catch (error) {
     console.error('Error in fetchEnvatoItems:', error);
     
@@ -83,15 +38,14 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
 
     if (fallbackError) {
       console.error('Error fetching fallback products:', fallbackError);
-      return [];
+      throw new Error('商品情報の取得に失敗しました。しばらく経ってからもう一度お試しください。');
     }
 
     if (fallbackProducts && fallbackProducts.length > 0) {
       console.log('Retrieved fallback products from database:', fallbackProducts.length);
-      return fallbackProducts;
+      return fallbackProducts as ProcessedItem[];
     }
 
-    console.error('No products available from any source');
-    return [];
+    throw new Error('商品情報の取得に失敗しました。しばらく経ってからもう一度お試しください。');
   }
 };
