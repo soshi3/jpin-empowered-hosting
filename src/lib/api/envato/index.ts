@@ -10,8 +10,14 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     const apiKey = await getEnvatoApiKey();
     console.log('Successfully retrieved API key');
 
-    const items = await searchEnvatoItems(apiKey, searchTerm);
+    const searchResponse = await searchEnvatoItems(apiKey, searchTerm);
+    const items = searchResponse.matches || [];
     console.log(`Retrieved ${items.length} items from search`);
+    
+    if (!items || items.length === 0) {
+      console.log('No items found in search response');
+      return [];
+    }
     
     const processedItems = await Promise.all(
       items.map(item => processEnvatoItem(item, apiKey))

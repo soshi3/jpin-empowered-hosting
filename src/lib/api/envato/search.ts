@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { EnvatoSearchResponse } from '../../types/envato';
+import { EnvatoResponse } from '../../types/envato';
 
 const ENVATO_API_URL = 'https://api.envato.com/v1/discovery/search/search/item';
 
@@ -9,6 +9,7 @@ export const createEnvatoSearchClient = (token: string) => {
     timeout: 30000,
     headers: {
       'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
     }
   });
 };
@@ -17,7 +18,7 @@ export const searchEnvatoItems = async (
   token: string,
   query: string = '',
   page: number = 1
-): Promise<EnvatoSearchResponse> => {
+): Promise<EnvatoResponse> => {
   const client = createEnvatoSearchClient(token);
   
   try {
@@ -25,9 +26,13 @@ export const searchEnvatoItems = async (
     const response = await client.get('', {
       params: {
         term: query,
+        site: 'codecanyon.net',
         page,
+        page_size: 30,
+        sort_by: 'sales'
       }
     });
+    console.log('Search response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error searching Envato items:', error);
