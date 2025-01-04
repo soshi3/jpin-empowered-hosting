@@ -43,7 +43,8 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
           term: searchTerm,
           site: 'codecanyon.net',
           page: page,
-          page_size: pageSize
+          page_size: pageSize,
+          sort_by: 'sales'  // 売上順でソート
         }
       });
 
@@ -93,6 +94,50 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
     const imageUrl = getBestImageUrl(detailedItem, item);
 
+    // 商品情報をSupabaseに保存または更新
+    const { data: existingProduct, error: fetchError } = await supabase
+      .from('products')
+      .select('sales')
+      .eq('id', String(item.id))
+      .single();
+
+    if (!fetchError && existingProduct) {
+      // 既存の商品情報を更新
+      const { error: updateError } = await supabase
+        .from('products')
+        .update({
+          title: item.name,
+          description: item.description,
+          price: Math.round(item.price_cents / 100),
+          image: imageUrl,
+          sales: (existingProduct.sales || 0) + 1, // 売上数を増やす
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', String(item.id));
+
+      if (updateError) {
+        console.error(`Error updating product ${item.id}:`, updateError);
+      }
+    } else {
+      // 新規商品を追加
+      const { error: insertError } = await supabase
+        .from('products')
+        .insert({
+          id: String(item.id),
+          title: item.name,
+          description: item.description,
+          price: Math.round(item.price_cents / 100),
+          image: imageUrl,
+          sales: 1, // 初期売上数を1に設定
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (insertError) {
+        console.error(`Error inserting product ${item.id}:`, insertError);
+      }
+    }
+
     return {
       id: String(item.id),
       title: item.name,
@@ -123,8 +168,20 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
       items.map(item => processEnvatoItem(item, apiKey))
     );
     
-    console.log('Successfully processed all items:', processedItems.length);
-    return processedItems;
+    // 売上数でソート
+    const { data: sortedProducts, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('sales', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching sorted products:', error);
+      return processedItems;
+    }
+
+    // Supabaseから取得したソート済みの商品リストを返す
+    console.log('Successfully retrieved sorted products:', sortedProducts?.length);
+    return sortedProducts || processedItems;
   } catch (error) {
     console.error('Error fetching Envato items:', error);
     if (axios.isAxiosError(error)) {
