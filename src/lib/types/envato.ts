@@ -53,7 +53,7 @@ export interface ProcessedItem {
   rating?: number;
   demo_url?: string | null;
   live_preview_url?: string | null;
-  url?: string;
+  url: string;
   created_at?: string;
   updated_at?: string;
   envato_id?: number;
