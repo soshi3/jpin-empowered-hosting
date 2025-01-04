@@ -22,12 +22,16 @@ const ProductDetail = () => {
         throw new Error("Product not found");
       }
       console.log('Found product:', product);
-      return product;
+      return {
+        ...product,
+        image: product.image?.value || product.image // Handle both object and string cases
+      };
     },
   });
 
   useEffect(() => {
     if (products?.image) {
+      console.log('Attempting to load image:', products.image);
       const img = new Image();
       img.onload = () => {
         console.log('Product image loaded successfully:', products.image);
