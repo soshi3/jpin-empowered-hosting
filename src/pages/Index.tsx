@@ -82,11 +82,11 @@ const Index = () => {
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90">
+              <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90 shadow-lg">
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20">
+              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-primary shadow-lg transition-all">
                 お問い合わせ
               </Button>
             </div>
