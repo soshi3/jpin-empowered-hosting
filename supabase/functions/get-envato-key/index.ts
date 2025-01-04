@@ -17,6 +17,7 @@ serve(async (req) => {
       throw new Error('ENVATO_API_KEY is not set')
     }
 
+    console.log('Successfully retrieved Envato API key')
     return new Response(
       JSON.stringify({ ENVATO_API_KEY }),
       {
