@@ -23,7 +23,7 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
       console.log("Fetching reviews for product:", productId);
       const { data, error } = await supabase
         .from("reviews")
-        .select(`*, profiles(email)`)
+        .select("*, profiles(email)")
         .eq("product_id", productId)
         .order("created_at", { ascending: false });
 
@@ -31,8 +31,17 @@ export const ProductReviews = ({ productId }: ProductReviewsProps) => {
         console.error("Error fetching reviews:", error);
         throw error;
       }
-      console.log("Fetched reviews:", data);
-      return data as Review[];
+
+      // Transform the data to match our Review type
+      const transformedData = data.map((review: any) => ({
+        ...review,
+        profiles: {
+          email: review.profiles?.email || "Unknown User"
+        }
+      }));
+
+      console.log("Fetched and transformed reviews:", transformedData);
+      return transformedData as Review[];
     },
   });
 
