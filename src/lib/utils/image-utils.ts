@@ -8,7 +8,13 @@ export const getBestImageUrl = (
 ): string => {
   console.log('Getting best image URL for item:', searchItem.id);
   
-  // Try to get preview images from the detailed response first
+  // First try to get the live preview URL from the search response
+  if (searchItem.live_preview_url) {
+    console.log('Found live preview URL:', searchItem.live_preview_url);
+    return searchItem.live_preview_url;
+  }
+
+  // Then try to get preview images from the detailed response
   if (itemData.preview) {
     const previewUrls = [
       itemData.preview.landscape_url,
@@ -22,9 +28,8 @@ export const getBestImageUrl = (
     }
   }
 
-  // Then try the search response preview URLs
+  // Then try the remaining preview URLs from search response
   const searchUrls = [
-    searchItem.live_preview_url,
     searchItem.preview_url,
     searchItem.thumbnail_url
   ].filter(Boolean);
