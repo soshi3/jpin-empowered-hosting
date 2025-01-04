@@ -1,9 +1,9 @@
 import { supabase } from '@/integrations/supabase/client';
-import { EnvatoItem, ProcessedItem } from '../../types/envato';
+import { EnvatoItem } from '../../types/envato';
 import { getBestImageUrl } from '../../utils/image-utils';
 import { getDetailedItemInfo } from './details';
 
-export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<ProcessedItem> => {
+export const processEnvatoItem = async (item: EnvatoItem, apiKey: string) => {
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
     const detailedItem = await getDetailedItemInfo(item.id, apiKey);
@@ -57,13 +57,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       }
     }
 
-    return {
-      id: String(item.id),
-      title: item.name,
-      description: item.description,
-      price: Math.round(item.price_cents / 100),
-      image: imageUrl
-    };
+    return productData;
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
     return {

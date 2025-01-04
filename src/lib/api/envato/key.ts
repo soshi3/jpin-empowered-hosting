@@ -4,7 +4,11 @@ import { handleEnvatoError } from '../../utils/image-utils';
 export const getEnvatoApiKey = async (): Promise<string> => {
   console.log('Invoking get-envato-key function...');
   try {
-    const { data: secretData, error: secretError } = await supabase.functions.invoke('get-envato-key');
+    const { data: secretData, error: secretError } = await supabase.functions.invoke('get-envato-key', {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
     
     if (secretError) {
       console.error('Error invoking get-envato-key function:', secretError);

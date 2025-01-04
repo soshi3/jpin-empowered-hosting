@@ -1,4 +1,5 @@
 import { EnvatoItem, EnvatoDetailedItem } from '../types/envato';
+import axios from 'axios';
 
 const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
 
@@ -31,10 +32,28 @@ export const getBestImageUrl = (
 export const handleEnvatoError = (error: unknown): never => {
   console.error('Envato API error:', error);
   
-  if (error instanceof Error) {
-    if (error.message.includes('Network Error') || error.message.includes('ECONNREFUSED')) {
+  if (axios.isAxiosError(error)) {
+    if (error.code === 'ECONNABORTED' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
       throw new Error('インターネット接続を確認してください。サーバーに接続できません。');
     }
+    if (error.response?.status === 401) {
+      throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
+    }
+    if (error.response?.status === 403) {
+      throw new Error('Envato APIへのアクセス権限がありません。APIキーの権限を確認してください。');
+    }
+    if (error.response?.status === 404) {
+      throw new Error('リクエストされたリソースが見つかりません。');
+    }
+    if (error.response?.status >= 500) {
+      throw new Error('Envatoサーバーでエラーが発生しました。しばらく待ってから再度お試しください。');
+    }
+    if (error.response?.data) {
+      throw new Error(`Envato API エラー: ${error.response.data.message || '不明なエラー'}`);
+    }
+  }
+  
+  if (error instanceof Error) {
     throw error;
   }
   
