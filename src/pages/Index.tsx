@@ -124,7 +124,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary to-secondary text-white py-24">
+      <section className="bg-gradient-to-r from-[#8B5CF6] via-[#D946EF] to-[#F97316] text-white py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
