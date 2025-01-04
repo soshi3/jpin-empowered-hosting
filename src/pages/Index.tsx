@@ -78,8 +78,9 @@ const Index = () => {
     <div className="min-h-screen">
       <Header />
       
-      {/* Hero Section with new gradient background */}
-      <section className="hero-gradient relative py-24">
+      {/* Hero Section with Stripe-like gradient background */}
+      <section className="hero-gradient relative py-24 overflow-hidden">
+        <div className="mesh-gradient"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
