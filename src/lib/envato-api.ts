@@ -85,6 +85,9 @@ export const fetchEnvatoItems = async (
     };
   } catch (error) {
     console.error('Error fetching Envato items:', error);
+    if (axios.isAxiosError(error) && error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    }
     throw new Error('Failed to fetch items from Envato');
   }
 };

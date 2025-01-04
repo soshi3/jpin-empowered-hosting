@@ -17,6 +17,7 @@ serve(async (req) => {
     
     const ENVATO_API_KEY = Deno.env.get('ENVATO_API_KEY')
     if (!ENVATO_API_KEY) {
+      console.error('ENVATO_API_KEY is not configured');
       throw new Error('ENVATO_API_KEY is not configured')
     }
 
@@ -32,12 +33,18 @@ serve(async (req) => {
     )
 
     if (!response.ok) {
-      console.error('Envato API error:', await response.text())
-      throw new Error(`Envato API error: ${response.status}`)
+      const errorText = await response.text();
+      console.error('Envato API error:', errorText);
+      throw new Error(`Envato API error: ${response.status} - ${errorText}`)
     }
 
     const data = await response.json()
-    console.log('Envato API response:', data)
+    console.log('Envato API response:', JSON.stringify(data, null, 2))
+
+    if (!data || !data.matches) {
+      console.error('Invalid response format from Envato API:', data);
+      throw new Error('Invalid response format from Envato API');
+    }
 
     return new Response(
       JSON.stringify(data),
@@ -52,7 +59,7 @@ serve(async (req) => {
     console.error('Error in get-envato-items function:', error)
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: error.message || 'An unexpected error occurred',
       }),
       {
         status: 500,
