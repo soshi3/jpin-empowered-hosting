@@ -18,16 +18,23 @@ interface EnvatoResponse {
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items...');
   try {
-    const { data: { ENVATO_API_KEY } } = await supabase.functions.invoke('get-envato-key');
-
-    if (!ENVATO_API_KEY) {
-      console.error('Error: No Envato API key found');
-      throw new Error('Envato APIキーの取得に失敗しました。');
+    console.log('Invoking get-envato-key function...');
+    const { data, error } = await supabase.functions.invoke('get-envato-key');
+    
+    if (error) {
+      console.error('Error invoking get-envato-key function:', error);
+      throw new Error('Envato APIキーの取得に失敗しました。サポートにお問い合わせください。');
     }
 
+    if (!data?.ENVATO_API_KEY) {
+      console.error('No Envato API key found in response:', data);
+      throw new Error('Envato APIキーが設定されていません。');
+    }
+
+    console.log('Successfully retrieved API key, making request to Envato API...');
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
-        'Authorization': `Bearer ${ENVATO_API_KEY}`,
+        'Authorization': `Bearer ${data.ENVATO_API_KEY}`,
       },
       params: {
         term: searchTerm,
