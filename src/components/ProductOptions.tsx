@@ -23,6 +23,20 @@ export const ProductOptions = ({
   basePrice,
   onPurchase
 }: ProductOptionsProps) => {
+  const handleHostingChange = (checked: boolean) => {
+    setSelectedOptions({
+      ...selectedOptions,
+      hosting: checked
+    });
+  };
+
+  const handleMaintenanceChange = (checked: boolean) => {
+    setSelectedOptions({
+      ...selectedOptions,
+      maintenance: checked
+    });
+  };
+
   return (
     <>
       <Card className="mb-8">
@@ -32,9 +46,7 @@ export const ProductOptions = ({
               <Checkbox
                 id="hosting"
                 checked={selectedOptions.hosting}
-                onCheckedChange={(checked) => 
-                  setSelectedOptions(prev => ({ ...prev, hosting: checked === true }))
-                }
+                onCheckedChange={(checked) => handleHostingChange(checked === true)}
               />
               <div className="grid gap-1.5">
                 <Label htmlFor="hosting" className="text-base font-semibold flex items-center gap-2">
@@ -52,9 +64,7 @@ export const ProductOptions = ({
               <Checkbox
                 id="maintenance"
                 checked={selectedOptions.maintenance}
-                onCheckedChange={(checked) => 
-                  setSelectedOptions(prev => ({ ...prev, maintenance: checked === true }))
-                }
+                onCheckedChange={(checked) => handleMaintenanceChange(checked === true)}
               />
               <div className="grid gap-1.5">
                 <Label htmlFor="maintenance" className="text-base font-semibold flex items-center gap-2">

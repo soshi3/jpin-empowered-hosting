@@ -8,10 +8,20 @@ export const getBestImageUrl = (
 ): string => {
   console.log('Getting best image URL for item:', searchItem.id);
   
-  // First try to get the live preview URL from the search response
+  // First try to get the preview URL from the search response
+  if (searchItem.preview_url) {
+    console.log('Found preview URL:', searchItem.preview_url);
+    return searchItem.preview_url;
+  }
+
   if (searchItem.live_preview_url) {
     console.log('Found live preview URL:', searchItem.live_preview_url);
     return searchItem.live_preview_url;
+  }
+
+  if (searchItem.thumbnail_url) {
+    console.log('Found thumbnail URL:', searchItem.thumbnail_url);
+    return searchItem.thumbnail_url;
   }
 
   // Then try to get preview images from the detailed response
@@ -26,17 +36,6 @@ export const getBestImageUrl = (
       console.log('Found preview image from detailed response:', previewUrls[0]);
       return previewUrls[0];
     }
-  }
-
-  // Then try the remaining preview URLs from search response
-  const searchUrls = [
-    searchItem.preview_url,
-    searchItem.thumbnail_url
-  ].filter(Boolean);
-
-  if (searchUrls.length > 0) {
-    console.log('Found preview image from search response:', searchUrls[0]);
-    return searchUrls[0];
   }
 
   console.log('No preview image found, using fallback image');
