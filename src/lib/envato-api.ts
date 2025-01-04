@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { supabase } from '@/integrations/supabase/client';
-import { EnvatoItem, EnvatoResponse, ProcessedItem } from './types/envato';
-import { getBestImageUrl } from './utils/image-utils';
+import { EnvatoItem, EnvatoResponse, ProcessedItem, EnvatoDetailedItem } from './types/envato';
+import { getBestImageUrl, handleEnvatoError } from './utils/image-utils';
 
 const getEnvatoApiKey = async (): Promise<string> => {
   console.log('Invoking get-envato-key function...');
@@ -21,11 +21,7 @@ const getEnvatoApiKey = async (): Promise<string> => {
     console.log('Successfully retrieved Envato API key');
     return secretData.ENVATO_API_KEY;
   } catch (error) {
-    console.error('Failed to get Envato API key:', error);
-    if (axios.isAxiosError(error) && error.message === 'Network Error') {
-      throw new Error('ネットワークエラーが発生しました。インターネット接続を確認してください。');
-    }
-    throw error;
+    return handleEnvatoError(error);
   }
 };
 
@@ -50,61 +46,37 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
       itemCount: searchResponse.data.matches?.length || 0
     });
 
-    if (!searchResponse.data.matches || searchResponse.data.matches.length === 0) {
-      console.log('No items found in Envato response');
-      return [];
-    }
-
-    return searchResponse.data.matches;
+    return searchResponse.data.matches || [];
   } catch (error) {
-    console.error('Error searching Envato items:', error);
-    if (axios.isAxiosError(error) && error.message === 'Network Error') {
-      throw new Error('Envato APIへの接続に失敗しました。インターネット接続を確認してください。');
-    }
-    throw error;
+    return handleEnvatoError(error);
+  }
+};
+
+const getDetailedItemInfo = async (itemId: number, apiKey: string): Promise<EnvatoDetailedItem> => {
+  console.log(`Fetching detailed information for item ${itemId}`);
+  try {
+    const response = await axios.get<EnvatoDetailedItem>(
+      `https://api.envato.com/v3/market/catalog/item?id=${itemId}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Accept': 'application/json',
+        }
+      }
+    );
+
+    console.log(`Received detailed info for item ${itemId}`);
+    return response.data;
+  } catch (error) {
+    return handleEnvatoError(error);
   }
 };
 
 const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<ProcessedItem> => {
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
-    
-    // Get detailed item information using v3 API
-    console.log(`Fetching detailed information for item ${item.id}`);
-    const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': 'application/json',
-      }
-    });
-
-    // Log the full response for debugging
-    console.log(`Full item response for ${item.id}:`, JSON.stringify(itemResponse.data, null, 2));
-
-    // Try to get preview image from different possible locations in the API response
-    let imageUrl = null;
-
-    // Try all possible image URL locations in order of preference
-    const possibleImageUrls = [
-      itemResponse.data.previews?.landscape_preview?.landscape_url,
-      itemResponse.data.previews?.icon_with_landscape_preview?.landscape_url,
-      itemResponse.data.preview_images?.[0]?.landscape_url,
-      itemResponse.data.preview_url,
-      itemResponse.data.live_preview_url,
-      item.live_preview_url,
-      item.preview_url,
-      item.thumbnail_url
-    ];
-
-    // Find the first valid URL
-    imageUrl = possibleImageUrls.find(url => url && typeof url === 'string');
-
-    if (imageUrl) {
-      console.log(`Found image URL for item ${item.id}:`, imageUrl);
-    } else {
-      console.log(`No image URL found for item ${item.id}, using default fallback`);
-      imageUrl = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
-    }
+    const detailedItem = await getDetailedItemInfo(item.id, apiKey);
+    const imageUrl = getBestImageUrl(detailedItem, item);
 
     return {
       id: String(item.id),

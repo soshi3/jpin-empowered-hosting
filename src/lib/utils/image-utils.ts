@@ -3,41 +3,40 @@ import { EnvatoItem, EnvatoDetailedItem } from '../types/envato';
 const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=800&q=80';
 
 export const getBestImageUrl = (
-  itemData: EnvatoDetailedItem,
+  detailedItem: EnvatoDetailedItem,
   searchItem: EnvatoItem
 ): string => {
-  console.log('Getting best image URL for item:', searchItem.id);
+  const possibleImageUrls = [
+    detailedItem.previews?.landscape_preview?.landscape_url,
+    detailedItem.previews?.icon_with_landscape_preview?.landscape_url,
+    detailedItem.previews?.preview_images?.[0]?.landscape_url,
+    detailedItem.previews?.preview_url,
+    detailedItem.previews?.live_preview_url,
+    searchItem.live_preview_url,
+    searchItem.preview_url,
+    searchItem.thumbnail_url
+  ];
+
+  const imageUrl = possibleImageUrls.find(url => url && typeof url === 'string');
   
-  // First try to get the preview URL from the search response
-  if (searchItem.preview_url) {
-    console.log('Found preview URL:', searchItem.preview_url);
-    return searchItem.preview_url;
+  if (imageUrl) {
+    console.log(`Found image URL for item ${searchItem.id}:`, imageUrl);
+    return imageUrl;
   }
 
-  if (searchItem.live_preview_url) {
-    console.log('Found live preview URL:', searchItem.live_preview_url);
-    return searchItem.live_preview_url;
-  }
-
-  if (searchItem.thumbnail_url) {
-    console.log('Found thumbnail URL:', searchItem.thumbnail_url);
-    return searchItem.thumbnail_url;
-  }
-
-  // Then try to get preview images from the detailed response
-  if (itemData.preview) {
-    const previewUrls = [
-      itemData.preview.landscape_url,
-      itemData.preview.icon_with_landscape_preview?.landscape_url,
-      itemData.preview.icon_url
-    ].filter(Boolean);
-
-    if (previewUrls.length > 0) {
-      console.log('Found preview image from detailed response:', previewUrls[0]);
-      return previewUrls[0];
-    }
-  }
-
-  console.log('No preview image found, using fallback image');
+  console.log(`No image URL found for item ${searchItem.id}, using default fallback`);
   return DEFAULT_FALLBACK_IMAGE;
+};
+
+export const handleEnvatoError = (error: unknown): never => {
+  console.error('Envato API error:', error);
+  
+  if (error instanceof Error) {
+    if (error.message === 'Network Error') {
+      throw new Error('ネットワークエラーが発生しました。インターネット接続を確認してください。');
+    }
+    throw error;
+  }
+  
+  throw new Error('予期せぬエラーが発生しました。');
 };

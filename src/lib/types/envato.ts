@@ -10,15 +10,23 @@ export interface EnvatoItem {
 }
 
 export interface EnvatoItemPreview {
-  landscape_url?: string;
+  landscape_preview?: {
+    landscape_url?: string;
+  };
   icon_with_landscape_preview?: {
     landscape_url?: string;
   };
-  icon_url?: string;
+  preview_images?: Array<{
+    landscape_url?: string;
+  }>;
+  preview_url?: string;
+  live_preview_url?: string;
 }
 
 export interface EnvatoDetailedItem {
-  preview?: EnvatoItemPreview;
+  id: number;
+  name: string;
+  previews: EnvatoItemPreview;
 }
 
 export interface EnvatoResponse {
@@ -31,4 +39,9 @@ export interface ProcessedItem {
   description: string;
   price: number;
   image: string;
+}
+
+export type EnvatoApiError = {
+  message: string;
+  code?: string;
 }
