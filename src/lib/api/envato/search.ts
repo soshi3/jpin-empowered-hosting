@@ -37,7 +37,7 @@ export const searchEnvatoItems = async (
     
     if (!response.data || typeof response.data !== 'object') {
       console.warn('Invalid response format from Envato API:', response.data);
-      throw new Error('Invalid response format from Envato API');
+      return { matches: [] };
     }
 
     // Ensure matches is an array
@@ -48,17 +48,12 @@ export const searchEnvatoItems = async (
   } catch (error) {
     console.error('Error searching Envato items:', error);
     if (axios.isAxiosError(error)) {
-      if (error.response?.status === 401) {
-        throw new Error('Invalid Envato API key. Please check your API key configuration.');
-      }
-      if (error.response?.status === 403) {
-        throw new Error('Access denied. Please check your Envato API key permissions.');
-      }
-      if (error.response?.status === 429) {
-        throw new Error('Too many requests. Please try again later.');
-      }
+      console.warn('Axios error details:', {
+        status: error.response?.status,
+        data: error.response?.data
+      });
     }
-    // Fallback to empty matches instead of throwing
+    // Return empty matches instead of throwing to allow fallback to database
     return { matches: [] };
   }
 };
