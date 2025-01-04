@@ -4,7 +4,7 @@ import { PricingSection } from "@/components/PricingSection";
 import { ContactForm } from "@/components/ContactForm";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
-import { ArrowRight, AlertCircle, Loader } from "lucide-react";
+import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
@@ -66,7 +66,7 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
-              <Loader className="w-8 h-8 animate-spin text-primary" />
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
               <p className="text-muted-foreground">商品を読み込み中...</p>
             </div>
           ) : error ? (

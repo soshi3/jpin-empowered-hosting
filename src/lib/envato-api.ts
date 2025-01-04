@@ -19,22 +19,22 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items...');
   try {
     console.log('Invoking get-envato-key function...');
-    const { data, error } = await supabase.functions.invoke('get-envato-key');
+    const { data: secretData, error: secretError } = await supabase.functions.invoke('get-envato-key');
     
-    if (error) {
-      console.error('Error invoking get-envato-key function:', error);
+    if (secretError) {
+      console.error('Error invoking get-envato-key function:', secretError);
       throw new Error('Envato APIキーの取得に失敗しました。サポートにお問い合わせください。');
     }
 
-    if (!data?.ENVATO_API_KEY) {
-      console.error('No Envato API key found in response:', data);
+    if (!secretData?.ENVATO_API_KEY) {
+      console.error('No Envato API key found in response:', secretData);
       throw new Error('Envato APIキーが設定されていません。');
     }
 
     console.log('Successfully retrieved API key, making request to Envato API...');
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
-        'Authorization': `Bearer ${data.ENVATO_API_KEY}`,
+        'Authorization': `Bearer ${secretData.ENVATO_API_KEY}`,
       },
       params: {
         term: searchTerm,
@@ -62,7 +62,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 403) {
         console.error('Received 403 error from Envato API:', error.response.data);
-        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
+        throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。\nEnvato APIキーは https://build.envato.com/create-token/ で生成できます。');
       }
       if (error.response?.data) {
         console.error('API Error response:', error.response.data);
