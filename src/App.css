@@ -38,10 +38,11 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(37, 99, 235, 0.4),
-    rgba(16, 185, 129, 0.4)
+    rgba(37, 99, 235, 0.6),
+    rgba(16, 185, 129, 0.6)
   );
   z-index: 1;
+  mix-blend-mode: overlay;
 }
 
 /* Animated gradient background inspired by Stripe */
@@ -58,10 +59,9 @@
     #ff3366
   );
   background-size: 400% 400%;
-  opacity: 0.65;
+  opacity: 0.45;
   animation: stripeGradient 15s ease infinite;
   z-index: 0;
-  mix-blend-mode: color;
 }
 
 .stripe-gradient::before {
