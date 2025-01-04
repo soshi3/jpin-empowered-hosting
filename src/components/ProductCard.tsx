@@ -60,7 +60,7 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
       <CardHeader className="p-0">
-        <div className="relative aspect-video w-full bg-gray-100">
+        <Link to={`/product/${id}`} className="relative aspect-video w-full bg-gray-100 block">
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -75,7 +75,7 @@ export const ProductCard = ({ id, title, description, price, image }: ProductCar
             onError={() => setImageError(true)}
             loading="lazy"
           />
-        </div>
+        </Link>
       </CardHeader>
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-4">
