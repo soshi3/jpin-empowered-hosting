@@ -32,7 +32,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }
 
     console.log('Making request to Envato API...');
-    const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
+    const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/search/item`, {
       headers: {
         'Authorization': `Bearer ${secretData.ENVATO_API_KEY}`,
         'Accept': 'application/json',
