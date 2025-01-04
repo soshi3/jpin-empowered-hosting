@@ -1,9 +1,14 @@
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Server, Shield } from "lucide-react";
 import { fetchEnvatoItems } from "@/lib/envato-api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { ProductImage } from "@/components/ProductImage";
 import { ProductOptions } from "@/components/ProductOptions";
@@ -17,12 +22,12 @@ const ProductDetail = () => {
     maintenance: false
   });
 
-  const { data: productData, isLoading, error } = useQuery({
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ["products", id],
     queryFn: async () => {
       console.log('Fetching product details for ID:', id);
-      const response = await fetchEnvatoItems('wordpress', 1);
-      const product = response.items.find(item => item.id === id);
+      const items = await fetchEnvatoItems();
+      const product = items.find(item => item.id === id);
       if (!product) {
         throw new Error("Product not found");
       }
@@ -32,7 +37,7 @@ const ProductDetail = () => {
   });
 
   const calculateTotalPrice = () => {
-    let total = productData?.price || 0;
+    let total = products?.price || 0;
     if (selectedOptions.hosting) total += 9800;
     if (selectedOptions.maintenance) total += 29800;
     return total;
@@ -85,14 +90,14 @@ const ProductDetail = () => {
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-2 gap-12">
-          <ProductImage product={productData} />
+          <ProductImage product={products} />
           <div>
-            <ProductHeader product={productData} />
+            <ProductHeader product={products} />
             <ProductOptions
               selectedOptions={selectedOptions}
               setSelectedOptions={setSelectedOptions}
               totalPrice={calculateTotalPrice()}
-              basePrice={productData?.price}
+              basePrice={products?.price}
               onPurchase={handlePurchase}
             />
           </div>

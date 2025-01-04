@@ -42,13 +42,13 @@ export const PricingSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-background dark:bg-[#1A1F2C]">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-bold text-center mb-4">サポートプラン</h2>
-        <p className="text-center text-muted-foreground mb-12">商品購入時にオプションとして追加できます</p>
+        <p className="text-center text-gray-600 mb-12">商品購入時にオプションとして追加できます</p>
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan) => (
-            <Card key={plan.name} className="relative overflow-hidden dark:bg-[#221F26] dark:border-muted">
+            <Card key={plan.name} className="relative overflow-hidden">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <p className="text-3xl font-bold mt-4">

@@ -13,46 +13,40 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
-          description_en: string
-          description_ja: string
+          description: string
           followers: number
           id: number
           is_promoted: boolean | null
           platform: string
           price: number
           promoted_until: string | null
-          title_en: string
-          title_ja: string
+          title: string
           updated_at: string
         }
         Insert: {
           created_at?: string
           created_by?: string | null
-          description_en: string
-          description_ja: string
+          description: string
           followers?: number
           id?: never
           is_promoted?: boolean | null
           platform: string
           price?: number
           promoted_until?: string | null
-          title_en: string
-          title_ja: string
+          title: string
           updated_at?: string
         }
         Update: {
           created_at?: string
           created_by?: string | null
-          description_en?: string
-          description_ja?: string
+          description?: string
           followers?: number
           id?: never
           is_promoted?: boolean | null
           platform?: string
           price?: number
           promoted_until?: string | null
-          title_en?: string
-          title_ja?: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
