@@ -1,8 +1,7 @@
 import { getEnvatoApiKey } from './key';
-import { searchEnvatoItems } from './search';
+import { searchAllEnvatoItems } from './search';
 import { processEnvatoItem } from './process';
 import { supabase } from '@/integrations/supabase/client';
-import axios from 'axios';
 import { EnvatoItem } from '../../types/envato';
 
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
@@ -11,7 +10,7 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     const apiKey = await getEnvatoApiKey();
     console.log('Successfully retrieved API key');
 
-    const searchResponse = await searchEnvatoItems(apiKey, searchTerm);
+    const searchResponse = await searchAllEnvatoItems(apiKey, searchTerm);
     console.log('Search response received:', {
       hasMatches: !!searchResponse?.matches,
       matchesLength: searchResponse?.matches?.length
