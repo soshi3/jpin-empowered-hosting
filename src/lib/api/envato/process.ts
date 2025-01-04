@@ -26,7 +26,7 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       description: item.description,
       price: Math.round(item.price_cents / 100),
       image: imageUrl,
-      additionalImages,
+      additional_images: additionalImages,
       sales: (existingProduct?.sales || 0) + 1,
       updated_at: new Date().toISOString()
     };
@@ -63,7 +63,14 @@ export const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promi
       console.error(`Database operation failed for product ${item.id}:`, dbError);
     }
 
-    return productData;
+    return {
+      id: String(item.id),
+      title: item.name,
+      description: item.description,
+      price: Math.round(item.price_cents / 100),
+      image: imageUrl,
+      additionalImages: additionalImages
+    };
   } catch (error) {
     console.error(`Error processing item ${item.id}:`, error);
     return {

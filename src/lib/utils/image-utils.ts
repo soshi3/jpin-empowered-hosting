@@ -42,7 +42,7 @@ export const getAdditionalImageUrls = (
       .filter((url): url is string => typeof url === 'string');
     
     if (extraImages.length > 0) {
-      console.log(`Found ${extraImages.length} additional images for item ${detailedItem.id}`);
+      console.log(`Found ${extraImages.length} additional images`);
       additionalImages.push(...extraImages);
     }
   }
