@@ -86,10 +86,10 @@ const Index = () => {
         </div>
         <div className="relative z-10 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-[0_4px_3px_rgba(0,0,0,0.4)]">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-white/95 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
+            <p className="text-xl mb-8 text-white/95 drop-shadow-[0_2px_2px_rgba(0,0,0,0.35)]">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
