@@ -13,7 +13,7 @@ export const ProductImage = ({ product }: ProductImageProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const fallbackImage = "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80";
 
-  const allImages = product ? [product.image, ...(product.additionalImages || [])] : [];
+  const allImages = product ? [product.image, ...(product.additional_images || [])] : [];
   const currentImage = allImages[currentImageIndex] || fallbackImage;
   const hasMultipleImages = allImages.length > 1;
 
