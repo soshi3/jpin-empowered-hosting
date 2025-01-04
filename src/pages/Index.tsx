@@ -6,32 +6,17 @@ import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { fetchEnvatoItems } from "@/lib/envato-api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Index = () => {
-  // 仮のデータ（後でEnvato APIから取得）
-  const products = [
-    {
-      id: "1",
-      title: "WordPressテーマ",
-      description: "モダンでレスポンシブなWordPressテーマ",
-      price: 19800,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "2",
-      title: "ECサイトテンプレート",
-      description: "高機能なECサイトテンプレート",
-      price: 29800,
-      image: "/placeholder.svg",
-    },
-    {
-      id: "3",
-      title: "ランディングページ",
-      description: "コンバージョン重視のランディングページ",
-      price: 15800,
-      image: "/placeholder.svg",
-    },
-  ];
+  const { data: products, isLoading, error } = useQuery({
+    queryKey: ['envato-products'],
+    queryFn: () => fetchEnvatoItems(),
+  });
+
+  console.log('Products data:', products);
 
   return (
     <div className="min-h-screen">
@@ -66,11 +51,28 @@ const Index = () => {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <ProductCard key={product.id} {...product} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid md:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-4">
+                  <Skeleton className="h-48 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500">
+              商品の読み込み中にエラーが発生しました。
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-8">
+              {products?.map((product) => (
+                <ProductCard key={product.id} {...product} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
