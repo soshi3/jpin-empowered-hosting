@@ -33,7 +33,7 @@ interface ProcessedEnvatoResponse {
 const ITEMS_PER_PAGE = 12;
 
 export const fetchEnvatoItems = async (
-  searchQuery: string,
+  searchQuery: string = 'wordpress',
   page: number = 1
 ): Promise<ProcessedEnvatoResponse> => {
   console.log(`Fetching Envato items for query: ${searchQuery}, page: ${page}`);
@@ -50,7 +50,7 @@ export const fetchEnvatoItems = async (
     console.log('Envato API Response:', envatoData);
 
     const processedItems: ProcessedItem[] = envatoData.matches.map(item => ({
-      id: item.id,
+      id: item.id.toString(),
       title: item.wordpress_theme_metadata?.theme_name || item.name,
       description: item.wordpress_theme_metadata?.description || item.description,
       author: item.author_username,
@@ -59,7 +59,8 @@ export const fetchEnvatoItems = async (
       price: item.price_cents / 100,
       previewUrl: item.preview_url,
       tags: item.wordpress_theme_metadata?.tags || [],
-      category: item.classification
+      category: item.classification,
+      image: item.preview_url // Adding the image property using preview_url
     }));
 
     const totalItems = envatoData.total_items;
