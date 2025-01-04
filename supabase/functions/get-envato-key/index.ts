@@ -14,6 +14,7 @@ serve(async (req) => {
   try {
     const ENVATO_API_KEY = Deno.env.get('ENVATO_API_KEY')
     if (!ENVATO_API_KEY) {
+      console.error('ENVATO_API_KEY is not set in environment variables')
       throw new Error('ENVATO_API_KEY is not set')
     }
 
