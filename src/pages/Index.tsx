@@ -78,26 +78,34 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Hero Section with new gradient background */}
+      {/* Hero Section with improved text readability */}
       <section className="relative min-h-[600px] w-full overflow-hidden">
         <div className="absolute inset-0">
           <div className="stripe-gradient" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90" />
         </div>
         <div className="relative z-10 container mx-auto px-4 py-24">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">
               プロフェッショナルな<br />ホスティングソリューション
             </h1>
-            <p className="text-xl mb-8 text-white/90">
+            <p className="text-xl mb-8 text-white/95 drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
               Codecanyonの商品と高品質なホスティング・保守運用を<br />ワンストップで提供
             </p>
             <div className="flex gap-4 justify-center">
-              <Button size="lg" variant="default" className="bg-white text-primary hover:bg-white/90">
+              <Button 
+                size="lg" 
+                variant="default" 
+                className="bg-white text-primary hover:bg-white/90 shadow-lg"
+              >
                 プランを見る
                 <ArrowRight className="ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="border-white text-white hover:bg-white/10 shadow-lg backdrop-blur-sm"
+              >
                 お問い合わせ
               </Button>
             </div>
@@ -107,15 +115,15 @@ const Index = () => {
 
       <FeaturesSection />
 
-      {/* Categories and Products Section */}
-      <section className="py-16">
+      {/* Categories and Products Section with improved readability */}
+      <section className="py-16 bg-background/95 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <CategorySection 
             selectedCategory={selectedCategory}
             onSelect={setSelectedCategory}
           />
           
-          <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-foreground">おすすめ商品</h2>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -160,9 +168,9 @@ const Index = () => {
       <FaqSection />
 
       {/* Contact Section */}
-      <section className="py-16">
+      <section className="py-16 bg-background/95 backdrop-blur-sm">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">お問い合わせ</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-foreground">お問い合わせ</h2>
           <ContactForm />
         </div>
       </section>

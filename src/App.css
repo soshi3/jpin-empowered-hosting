@@ -44,7 +44,7 @@
   z-index: 1;
 }
 
-/* New animated gradient background inspired by Stripe */
+/* Animated gradient background inspired by Stripe */
 .stripe-gradient {
   position: absolute;
   inset: 0;
@@ -58,10 +58,10 @@
     #ff3366
   );
   background-size: 400% 400%;
-  opacity: 0.7;
+  opacity: 0.85;
   animation: stripeGradient 15s ease infinite;
   z-index: 0;
-  mix-blend-mode: overlay;
+  mix-blend-mode: soft-light;
 }
 
 .stripe-gradient::before {
