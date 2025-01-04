@@ -22,7 +22,23 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     console.log(`Processing ${items.length} items from search`);
     
     if (items.length === 0) {
-      console.warn('No valid items found in search response');
+      // Try to fetch from Supabase if API search returns no results
+      const { data: existingProducts, error: dbError } = await supabase
+        .from('products')
+        .select('*')
+        .order('sales', { ascending: false });
+
+      if (dbError) {
+        console.error('Error fetching from database:', dbError);
+        return [];
+      }
+
+      if (existingProducts && existingProducts.length > 0) {
+        console.log('Retrieved existing products from database:', existingProducts.length);
+        return existingProducts;
+      }
+
+      console.warn('No products found in either API or database');
       return [];
     }
     
@@ -58,6 +74,22 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     return sortedProducts || validProcessedItems;
   } catch (error) {
     console.error('Error in fetchEnvatoItems:', error);
+    // Try to fetch from database as fallback
+    const { data: fallbackProducts, error: fallbackError } = await supabase
+      .from('products')
+      .select('*')
+      .order('sales', { ascending: false });
+
+    if (fallbackError) {
+      console.error('Error fetching fallback products:', fallbackError);
+      throw error;
+    }
+
+    if (fallbackProducts && fallbackProducts.length > 0) {
+      console.log('Retrieved fallback products from database:', fallbackProducts.length);
+      return fallbackProducts;
+    }
+
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 404) {
         throw new Error('Envato APIのエンドポイントにアクセスできません。APIキーの権限を確認してください。\n\n必要な権限:\n- "View and search Envato sites"\n- "View your items\' sales history"');
