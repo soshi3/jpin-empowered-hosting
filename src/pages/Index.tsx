@@ -14,6 +14,7 @@ import { useState, useMemo } from "react";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { SearchInput } from "@/components/SearchInput";
 import { categorizeProducts } from "@/utils/categoryUtils";
+import { Badge } from "@/components/ui/badge";
 
 const Index = () => {
   const { toast } = useToast();
@@ -67,13 +68,7 @@ const Index = () => {
       filtered = products.filter(product => {
         const titleMatch = product.title?.toLowerCase().includes(query);
         const descriptionMatch = product.description?.toLowerCase().includes(query);
-        const authorMatch = product.author?.toLowerCase().includes(query);
-        const categoryMatch = product.category?.toLowerCase().includes(query);
-        const tagsMatch = product.tags?.some(tag => 
-          tag.toLowerCase().includes(query)
-        );
-        
-        return titleMatch || descriptionMatch || authorMatch || categoryMatch || tagsMatch;
+        return titleMatch || descriptionMatch;
       });
       
       console.log('Products after search filtering:', filtered.length);
@@ -132,7 +127,14 @@ const Index = () => {
       {/* Products Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
+          <div className="flex items-center justify-center gap-2 mb-12">
+            <h2 className="text-3xl font-bold text-center">おすすめ商品</h2>
+            {!isLoading && products && (
+              <Badge variant="secondary" className="text-sm">
+                全{products.length}件
+              </Badge>
+            )}
+          </div>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
