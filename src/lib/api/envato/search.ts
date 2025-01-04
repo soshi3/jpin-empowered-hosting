@@ -23,24 +23,27 @@ export const searchEnvatoItems = async (apiKey: string, searchTerm: string): Pro
           page_size: PAGE_SIZE,
           sort_by: 'sales'
         },
-        timeout: 60000 // 60 second timeout for larger requests
+        timeout: 30000
       });
 
-      if (!searchResponse.data || !Array.isArray(searchResponse.data.matches)) {
-        console.error('Invalid response format from Envato API:', searchResponse.data);
+      if (!searchResponse.data?.matches) {
+        console.error('Invalid or empty response from Envato API:', searchResponse.data);
         break;
       }
 
       const items = searchResponse.data.matches;
+      console.log(`Retrieved ${items.length} items from Envato API`);
+
       if (items.length === 0) {
         console.log(`No more items found on page ${page}`);
         break;
       }
 
       allItems.push(...items);
-      console.log(`Retrieved ${items.length} items from page ${page}. Total items so far: ${allItems.length}`);
+      console.log(`Total items retrieved so far: ${allItems.length}`);
 
       if (page < MAX_PAGES && items.length === PAGE_SIZE) {
+        console.log(`Waiting ${REQUEST_DELAY}ms before next request...`);
         await new Promise(resolve => setTimeout(resolve, REQUEST_DELAY));
       } else {
         break;

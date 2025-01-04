@@ -8,11 +8,15 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items with search term:', searchTerm);
   try {
     const apiKey = await getEnvatoApiKey();
+    console.log('Successfully retrieved API key');
+
     const items = await searchEnvatoItems(apiKey, searchTerm);
+    console.log(`Retrieved ${items.length} items from search`);
     
     const processedItems = await Promise.all(
       items.map(item => processEnvatoItem(item, apiKey))
     );
+    console.log(`Processed ${processedItems.length} items`);
     
     const { data: sortedProducts, error } = await supabase
       .from('products')
