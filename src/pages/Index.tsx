@@ -43,6 +43,15 @@ const Index = () => {
     }
   });
 
+  const handleSearch = (query: string) => {
+    console.log('Performing search with query:', query);
+    setSearchQuery(query);
+    toast({
+      title: "検索実行",
+      description: `「${query}」で検索しています...`,
+    });
+  };
+
   // 検索とカテゴリーフィルタリングを組み合わせた商品リストを生成
   const filteredProducts = useMemo(() => {
     if (!products) return [];
@@ -123,7 +132,11 @@ const Index = () => {
             </Alert>
           ) : products && products.length > 0 ? (
             <div className="space-y-8">
-              <SearchInput value={searchQuery} onChange={setSearchQuery} />
+              <SearchInput 
+                value={searchQuery} 
+                onChange={setSearchQuery}
+                onSearch={handleSearch}
+              />
               <CategoryFilter onCategoryChange={setActiveCategory} />
 
               <div className="grid md:grid-cols-3 gap-8">
