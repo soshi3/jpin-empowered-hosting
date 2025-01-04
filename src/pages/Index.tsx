@@ -4,18 +4,22 @@ import { PricingSection } from "@/components/PricingSection";
 import { ContactForm } from "@/components/ContactForm";
 import { FeaturesSection } from "@/components/FeaturesSection";
 import { FaqSection } from "@/components/FaqSection";
+import { CategorySection } from "@/components/CategorySection";
 import { ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Index = () => {
   const { toast } = useToast();
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ['envato-products'],
-    queryFn: () => fetchEnvatoItems(),
+    queryKey: ['envato-products', selectedCategory],
+    queryFn: () => fetchEnvatoItems(selectedCategory === "all" ? "wordpress" : `wordpress ${selectedCategory}`),
     meta: {
       onError: (error: Error) => {
         toast({
@@ -28,6 +32,7 @@ const Index = () => {
   });
 
   console.log('Products data:', products);
+  console.log('Selected category:', selectedCategory);
   console.log('Error:', error);
 
   return (
@@ -59,9 +64,14 @@ const Index = () => {
 
       <FeaturesSection />
 
-      {/* Products Section */}
+      {/* Categories and Products Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
+          <CategorySection 
+            selectedCategory={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+          
           <h2 className="text-3xl font-bold text-center mb-12">おすすめ商品</h2>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center space-y-4">
