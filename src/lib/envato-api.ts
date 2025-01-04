@@ -36,8 +36,6 @@ export const fetchEnvatoItems = async (
   searchQuery: string = 'wordpress',
   page: number = 1
 ): Promise<ProcessedEnvatoResponse> => {
-  console.log(`Fetching Envato items for query: ${searchQuery}, page: ${page}`);
-  
   try {
     const response = await axios.get<EnvatoResponse>('/api/get-envato-items', {
       params: {
@@ -46,17 +44,8 @@ export const fetchEnvatoItems = async (
       }
     });
 
-    // Log the raw response for debugging
-    console.log('Raw Envato API Response:', response.data);
-
-    if (!response.data || !response.data.matches) {
-      console.error('Invalid response format from Envato API:', response.data);
-      throw new Error('Invalid response format from Envato API');
-    }
-
     const envatoData = response.data;
-    console.log('Processed Envato API Response:', envatoData);
-
+    
     const processedItems: ProcessedItem[] = envatoData.matches.map(item => ({
       id: item.id.toString(),
       title: item.wordpress_theme_metadata?.theme_name || item.name,
@@ -75,8 +64,6 @@ export const fetchEnvatoItems = async (
     const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
     const hasMore = page < totalPages;
 
-    console.log(`Processed ${processedItems.length} items. Has more: ${hasMore}`);
-
     return {
       items: processedItems,
       total: totalItems,
@@ -85,9 +72,6 @@ export const fetchEnvatoItems = async (
     };
   } catch (error) {
     console.error('Error fetching Envato items:', error);
-    if (axios.isAxiosError(error) && error.response?.data?.error) {
-      throw new Error(error.response.data.error);
-    }
     throw new Error('Failed to fetch items from Envato');
   }
 };
