@@ -49,4 +49,5 @@ export interface ProcessedItem {
   rating?: number;
   demo_url?: string | null;
   live_preview_url?: string | null;
+  url?: string;
 }
