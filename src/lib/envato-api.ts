@@ -28,8 +28,8 @@ const getEnvatoApiKey = async (): Promise<string> => {
 const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<EnvatoItem[]> => {
   console.log('Making request to Envato API with search term:', searchTerm);
   const allItems: EnvatoItem[] = [];
-  const pageSize = 30; // 1ページあたりの商品数を30件に変更
-  const maxPages = 1; // 初回は1ページのみ取得
+  const pageSize = 30; // 1ページあたりの商品数
+  const maxPages = 3; // 3ページ（90件）まで取得するように変更
 
   try {
     for (let page = 1; page <= maxPages; page++) {
@@ -49,13 +49,14 @@ const searchEnvatoItems = async (apiKey: string, searchTerm: string): Promise<En
 
       const items = searchResponse.data.matches || [];
       if (items.length === 0) {
+        console.log(`No more items found on page ${page}`);
         break;
       }
 
       allItems.push(...items);
-      console.log(`Retrieved ${items.length} items from page ${page}`);
+      console.log(`Retrieved ${items.length} items from page ${page}. Total items so far: ${allItems.length}`);
 
-      // APIレート制限に配慮して少し待機
+      // APIレート制限に配慮して少し待機（1秒）
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
