@@ -17,9 +17,14 @@ interface EnvatoResponse {
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items...');
   try {
+    const apiKey = import.meta.env.VITE_ENVATO_API_KEY;
+    if (!apiKey) {
+      throw new Error('Envato APIキーが設定されていません。');
+    }
+
     const response = await axios.get<EnvatoResponse>(`${ENVATO_API_URL}/catalog/search`, {
       headers: {
-        'Authorization': `Bearer ${import.meta.env.VITE_ENVATO_API_KEY}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       params: {
         term: searchTerm,
@@ -38,6 +43,9 @@ export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
     }));
   } catch (error) {
     console.error('Error fetching Envato items:', error);
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      throw new Error('Envato APIキーが無効です。正しいAPIキーを設定してください。');
+    }
     throw error;
   }
 }
