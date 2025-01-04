@@ -24,16 +24,35 @@ interface ProductCardProps {
 export const ProductCard = ({ id, title, description, price, image, additional_images = [] }: ProductCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const allImages = [image, ...(additional_images || [])].filter(Boolean) as string[];
+
+  // Filter out null/undefined values and ensure string type
+  const allImages = [image, ...(additional_images || [])].filter((img): img is string => 
+    typeof img === 'string' && img.length > 0
+  );
+  
   const hasMultipleImages = allImages.length > 1;
 
+  const getFallbackImage = () => {
+    const fallbackImages = [
+      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80",
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80",
+      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80",
+    ];
+    const index = parseInt(id, 10) % fallbackImages.length;
+    return fallbackImages[index];
+  };
+
+  // Get current image URL with fallback
+  const currentImage = imageError || !image ? getFallbackImage() : image;
+
   useEffect(() => {
-    console.log(`Loading images for product ${id}:`, { image, additional_images });
+    console.log(`Loading images for product ${id}:`, { image, additional_images, currentImage });
     setImageError(false);
     setIsLoading(true);
 
-    if (!image) {
-      console.log(`No image URL provided for product ${id}, using fallback`);
+    if (!currentImage) {
+      console.log(`No valid image URL for product ${id}, using fallback`);
       setImageError(true);
       setIsLoading(false);
       return;
@@ -67,20 +86,7 @@ export const ProductCard = ({ id, title, description, price, image, additional_i
     };
 
     loadImages();
-  }, [image, id, allImages]);
-
-  const getFallbackImage = () => {
-    const fallbackImages = [
-      "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80",
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&q=80",
-      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80",
-      "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&q=80",
-    ];
-    const index = parseInt(id, 10) % fallbackImages.length;
-    return fallbackImages[index];
-  };
-
-  const currentImage = imageError ? getFallbackImage() : image;
+  }, [id, image, allImages, currentImage]);
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg">
