@@ -17,12 +17,14 @@ const Index = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
     queryFn: () => fetchEnvatoItems(),
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "エラー",
-        description: error instanceof Error ? error.message : "商品の読み込み中にエラーが発生しました。",
-      });
+    meta: {
+      onError: (error: Error) => {
+        toast({
+          variant: "destructive",
+          title: "エラー",
+          description: error.message || "商品の読み込み中にエラーが発生しました。",
+        });
+      }
     }
   });
 

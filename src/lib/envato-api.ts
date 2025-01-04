@@ -18,13 +18,10 @@ interface EnvatoResponse {
 export const fetchEnvatoItems = async (searchTerm: string = 'wordpress') => {
   console.log('Fetching Envato items...');
   try {
-    const { data: { ENVATO_API_KEY }, error } = await supabase
-      .from('secrets')
-      .select('ENVATO_API_KEY')
-      .single();
+    const { data: { ENVATO_API_KEY } } = await supabase.functions.invoke('get-envato-key');
 
-    if (error || !ENVATO_API_KEY) {
-      console.error('Error fetching Envato API key:', error);
+    if (!ENVATO_API_KEY) {
+      console.error('Error: No Envato API key found');
       throw new Error('Envato APIキーの取得に失敗しました。');
     }
 
