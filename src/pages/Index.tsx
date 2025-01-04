@@ -21,17 +21,19 @@ const Index = () => {
   
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['envato-products'],
-    queryFn: () => fetchEnvatoItems(),
+    queryFn: () => {
+      console.log('Fetching Envato products...');
+      return fetchEnvatoItems();
+    },
     staleTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ
-    cacheTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ保持
-    meta: {
-      onError: (error: Error) => {
-        toast({
-          variant: "destructive",
-          title: "エラー",
-          description: error.message || "商品の読み込み中にエラーが発生しました。",
-        });
-      }
+    gcTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ保持
+    onError: (error: Error) => {
+      console.error('Error fetching Envato products:', error);
+      toast({
+        variant: "destructive",
+        title: "エラー",
+        description: error.message || "商品の読み込み中にエラーが発生しました。",
+      });
     }
   });
 
