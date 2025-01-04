@@ -11,7 +11,7 @@ import { fetchEnvatoItems } from "@/lib/envato-api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { PRODUCT_CATEGORIES } from "@/lib/types/categories";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const { toast } = useToast();
@@ -37,15 +37,25 @@ const Index = () => {
     if (!products) return {};
     
     return products.reduce((acc: Record<string, any[]>, product) => {
-      // 商品名に基づいて簡易的にカテゴリー分類
+      // タイトルとdescriptionに基づいて詳細なカテゴリー分類
       let category = 'web-app'; // デフォルトカテゴリー
+      const titleLower = product.title.toLowerCase();
+      const descLower = product.description.toLowerCase();
       
-      if (product.title.toLowerCase().includes('landing') || 
-          product.title.toLowerCase().includes('lp')) {
+      if (titleLower.includes('landing') || titleLower.includes('lp')) {
         category = 'landing-page';
-      } else if (product.title.toLowerCase().includes('admin') || 
-                 product.title.toLowerCase().includes('dashboard')) {
+      } else if (titleLower.includes('admin') || titleLower.includes('dashboard')) {
         category = 'dashboard';
+      } else if (titleLower.includes('shop') || titleLower.includes('ecommerce') || titleLower.includes('store')) {
+        category = 'ecommerce';
+      } else if (titleLower.includes('community') || titleLower.includes('social') || titleLower.includes('forum')) {
+        category = 'community';
+      } else if (titleLower.includes('business') || titleLower.includes('corporate')) {
+        category = 'business';
+      } else if (titleLower.includes('developer') || titleLower.includes('api') || descLower.includes('developer')) {
+        category = 'developer';
+      } else if (titleLower.includes('design') || titleLower.includes('ui kit') || descLower.includes('design')) {
+        category = 'design';
       }
       
       if (!acc[category]) {
@@ -102,38 +112,54 @@ const Index = () => {
               </AlertDescription>
             </Alert>
           ) : products && products.length > 0 ? (
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="grid w-full max-w-2xl mx-auto mb-8 grid-cols-4">
-                <TabsTrigger value="all">すべて</TabsTrigger>
-                {PRODUCT_CATEGORIES.map((category) => (
-                  <TabsTrigger key={category.id} value={category.id}>
-                    {category.name}
-                  </TabsTrigger>
+            <div className="space-y-8">
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "flex flex-col items-center gap-2 h-auto py-4 hover:bg-primary hover:text-primary-foreground",
+                    "all" === "all" && "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => window.location.hash = "#all"}
+                >
+                  <ArrowRight className="w-6 h-6" />
+                  <span className="text-sm">すべて</span>
+                </Button>
+                {PRODUCT_CATEGORIES.map((category) => {
+                  const Icon = category.icon;
+                  const isActive = window.location.hash === `#${category.id}`;
+                  return (
+                    <Button
+                      key={category.id}
+                      variant="outline"
+                      className={cn(
+                        "flex flex-col items-center gap-2 h-auto py-4 hover:bg-primary hover:text-primary-foreground",
+                        isActive && "bg-primary text-primary-foreground"
+                      )}
+                      onClick={() => window.location.hash = `#${category.id}`}
+                    >
+                      <Icon className="w-6 h-6" />
+                      <span className="text-sm">{category.name}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {(!window.location.hash || window.location.hash === "#all" ? products : 
+                  categorizeProducts(products)[window.location.hash.slice(1)] || []
+                ).map((product: any) => (
+                  <ProductCard key={product.id} {...product} />
                 ))}
-              </TabsList>
-
-              <TabsContent value="all">
-                <div className="grid md:grid-cols-3 gap-8">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} {...product} />
-                  ))}
-                </div>
-              </TabsContent>
-
-              {PRODUCT_CATEGORIES.map((category) => (
-                <TabsContent key={category.id} value={category.id}>
-                  <div className="grid md:grid-cols-3 gap-8">
-                    {categorizeProducts(products)[category.id]?.map((product: any) => (
-                      <ProductCard key={product.id} {...product} />
-                    )) || (
-                      <p className="col-span-3 text-center text-muted-foreground py-8">
-                        このカテゴリーの商品は現在ありません。
-                      </p>
-                    )}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
+                {window.location.hash && window.location.hash !== "#all" && 
+                 (!categorizeProducts(products)[window.location.hash.slice(1)] || 
+                  categorizeProducts(products)[window.location.hash.slice(1)].length === 0) && (
+                  <p className="col-span-3 text-center text-muted-foreground py-8">
+                    このカテゴリーの商品は現在ありません。
+                  </p>
+                )}
+              </div>
+            </div>
           ) : (
             <div className="text-center text-muted-foreground">
               商品が見つかりませんでした。
