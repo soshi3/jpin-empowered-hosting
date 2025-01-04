@@ -27,13 +27,18 @@ const Index = () => {
     },
     staleTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ
     gcTime: 4 * 60 * 60 * 1000, // 4時間のキャッシュ保持
-    onError: (error: Error) => {
-      console.error('Error fetching Envato products:', error);
-      toast({
-        variant: "destructive",
-        title: "エラー",
-        description: error.message || "商品の読み込み中にエラーが発生しました。",
-      });
+    retry: 3,
+    retryDelay: 1000,
+    throwOnError: true,
+    meta: {
+      errorHandler: (error: Error) => {
+        console.error('Error fetching Envato products:', error);
+        toast({
+          variant: "destructive",
+          title: "エラー",
+          description: error.message || "商品の読み込み中にエラーが発生しました。",
+        });
+      }
     }
   });
 
