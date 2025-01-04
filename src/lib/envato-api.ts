@@ -69,6 +69,21 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
   try {
     console.log(`Processing item ${item.id}: ${item.name}`);
     
+    // First try to get the preview image directly from the search response
+    if (item.live_preview_url || item.preview_url || item.thumbnail_url) {
+      const imageUrl = item.live_preview_url || item.preview_url || item.thumbnail_url;
+      console.log(`Using direct preview URL for item ${item.id}:`, imageUrl);
+      return {
+        id: String(item.id),
+        title: item.name,
+        description: item.description,
+        price: Math.round(item.price_cents / 100),
+        image: imageUrl
+      };
+    }
+
+    // If no direct preview URL is available, try to get detailed item information
+    console.log(`Fetching detailed information for item ${item.id}`);
     const itemResponse = await axios.get(`https://api.envato.com/v3/market/catalog/item?id=${item.id}`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
@@ -83,7 +98,7 @@ const processEnvatoItem = async (item: EnvatoItem, apiKey: string): Promise<Proc
     });
 
     const imageUrl = getBestImageUrl(itemResponse.data, item);
-    console.log(`Image URL for item ${item.id}:`, imageUrl);
+    console.log(`Final image URL for item ${item.id}:`, imageUrl);
 
     return {
       id: String(item.id),
