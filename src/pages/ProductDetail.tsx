@@ -10,21 +10,20 @@ import { ProductReviews } from "@/components/ProductReviews";
 import { SimilarProducts } from "@/components/SimilarProducts";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ProcessedItem } from "@/lib/types/envato";
 
 const ProductDetail = () => {
   const { id } = useParams();
-  const { data: product, isLoading, error } = useQuery({
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ["products", id],
     queryFn: async () => {
       console.log('Fetching product details for ID:', id);
       const items = await fetchEnvatoItems();
-      const foundProduct = items.find(item => item.id === id);
-      if (!foundProduct) {
+      const product = items.find(item => item.id === id);
+      if (!product) {
         throw new Error("Product not found");
       }
-      console.log('Found product:', foundProduct);
-      return foundProduct as ProcessedItem;
+      console.log('Found product:', product);
+      return product;
     },
   });
 
@@ -39,7 +38,7 @@ const ProductDetail = () => {
     );
   }
 
-  if (error || !product) {
+  if (error) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -59,7 +58,7 @@ const ProductDetail = () => {
     );
   }
 
-  const hasPreviewLinks = product.demo_url || product.live_preview_url;
+  const hasPreviewLinks = products?.url || products?.live_preview_url;
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,33 +66,33 @@ const ProductDetail = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="grid lg:grid-cols-2 gap-12 mb-16">
           <div className="space-y-8">
-            <ProductImage product={product} />
+            <ProductImage product={products} />
             <div className="p-6 bg-muted rounded-lg">
               <h3 className="text-lg font-semibold mb-4">Product Information</h3>
               <dl className="space-y-4">
-                {product.author && (
+                {products?.author && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">Author</dt>
-                    <dd className="text-base">{product.author}</dd>
+                    <dd className="text-base">{products.author}</dd>
                   </div>
                 )}
-                {product.sales !== undefined && (
+                {products?.sales !== undefined && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">Total Sales</dt>
-                    <dd className="text-base">{product.sales.toLocaleString()} sales</dd>
+                    <dd className="text-base">{products.sales.toLocaleString()} sales</dd>
                   </div>
                 )}
-                {product.category && (
+                {products?.category && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">Category</dt>
-                    <dd className="text-base">{product.category}</dd>
+                    <dd className="text-base">{products.category}</dd>
                   </div>
                 )}
-                {product.tags && product.tags.length > 0 && (
+                {products?.tags && products.tags.length > 0 && (
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">Tags</dt>
                     <dd className="flex flex-wrap gap-2 mt-1">
-                      {product.tags.map((tag, index) => (
+                      {products.tags.map((tag, index) => (
                         <span
                           key={index}
                           className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
@@ -111,21 +110,21 @@ const ProductDetail = () => {
               <div className="p-6 bg-muted rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">Demo & Preview</h3>
                 <div className="space-y-3">
-                  {product.demo_url && (
+                  {products?.url && (
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => window.open(product.demo_url || '', '_blank')}
+                      onClick={() => window.open(products.url, '_blank')}
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       View Demo
                     </Button>
                   )}
-                  {product.live_preview_url && (
+                  {products?.live_preview_url && (
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => window.open(product.live_preview_url || '', '_blank')}
+                      onClick={() => window.open(products.live_preview_url, '_blank')}
                     >
                       <ExternalLink className="w-4 h-4 mr-2" />
                       Live Preview
@@ -136,8 +135,8 @@ const ProductDetail = () => {
             )}
           </div>
           <div className="space-y-8">
-            <ProductHeader product={product} />
-            <ProductOptions basePrice={product.price} />
+            <ProductHeader product={products} />
+            <ProductOptions basePrice={products?.price} />
           </div>
         </div>
 
@@ -149,7 +148,7 @@ const ProductDetail = () => {
         
         <SimilarProducts 
           currentProductId={id || ""}
-          category={product.category}
+          category={products?.category}
           priceRange={100}
         />
       </main>

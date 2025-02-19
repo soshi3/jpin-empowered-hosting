@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { EnvatoDetailedItem } from '../../types/envato';
+import { handleEnvatoError } from '../../utils/image-utils';
 
 export const getDetailedItemInfo = async (itemId: number, apiKey: string): Promise<EnvatoDetailedItem> => {
   console.log(`Fetching detailed information for item ${itemId}`);
@@ -17,7 +18,7 @@ export const getDetailedItemInfo = async (itemId: number, apiKey: string): Promi
     console.log(`Received detailed info for item ${itemId}`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching detailed info for item ${itemId}:`, error);
-    throw error;
+    console.error(`Error fetching details for item ${itemId}:`, error);
+    return handleEnvatoError(error);
   }
 };
